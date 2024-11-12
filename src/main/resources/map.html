@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>카카오맵 API 테스트</title>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4eae4d5ae64024c4ab8a3c31c920d370"></script>
+</head>
+<body>
+<!--<h1>카카오맵 테스트</h1>-->
+<div id="map" style="width:770px;height:440px;"></div>
+<script>
+    var mapContainer = document.getElementById('map'); // 지도를 표시할 div
+    var mapOption = {
+        center: new kakao.maps.LatLng(37.4878925, 126.8252908), // 지도의 중심좌표
+        level: 6 // 지도의 확대 레벨
+    };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성
+    
+    var positions = [
+        {
+            title: '온수역',
+            latlng: new kakao.maps.LatLng(37.4925717, 126.8230869)
+        },
+        {
+            title: '천왕역',
+            latlng: new kakao.maps.LatLng(37.4868818, 126.8385147)
+        }
+    ];
+
+    for (var i = 0; i < positions.length; i++) {
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: positions[i].latlng,
+            title: positions[i].title
+        });
+    }
+
+    
+</script>
+</body>
+</html>

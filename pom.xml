@@ -7,50 +7,41 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>seoulbin</name>
 
-	<properties>
+    <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+
     <repositories>
         <repository>
-            <id>local-libs</id>
-            <url>file://${project.basedir}/libs</url>
+            <id>com.teamdev</id>
+            <url>https://europe-maven.pkg.dev/jxbrowser/releases</url>
         </repository>
     </repositories>
-    
+
     <dependencies>
         <dependency>
-            <groupId>com.teamdev</groupId>
+            <groupId>com.teamdev.jxbrowser</groupId>
             <artifactId>jxbrowser</artifactId>
             <version>8.1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/jxbrowser-8.1.0.jar</systemPath>
         </dependency>
-        
         <dependency>
-            <groupId>com.teamdev</groupId>
+            <groupId>com.teamdev.jxbrowser</groupId>
             <artifactId>jxbrowser-swing</artifactId>
             <version>8.1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/jxbrowser-swing-8.1.0.jar</systemPath>
         </dependency>
-
         <dependency>
-            <groupId>com.teamdev</groupId>
+            <groupId>com.teamdev.jxbrowser</groupId>
             <artifactId>jxbrowser-swt</artifactId>
             <version>8.1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/jxbrowser-swt-8.1.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.teamdev.jxbrowser</groupId>
+            <artifactId>jxbrowser-cross-platform</artifactId>
+            <version>8.1.0</version>
+            <type>pom</type>
         </dependency>
 
-        <dependency>
-            <groupId>com.teamdev</groupId>
-            <artifactId>jxbrowser-win</artifactId>
-            <version>8.1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/jxbrowser-win64-8.1.0.jar</systemPath>
-        </dependency>
-	</dependencies>
+    </dependencies>
 </project>

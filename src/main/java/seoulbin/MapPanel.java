@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import javax.swing.*;
 
+// 스윙에서 지도를 표시하는 패널
 public class MapPanel extends JPanel {
     private Browser browser;
     private Engine engine;
@@ -20,6 +21,7 @@ public class MapPanel extends JPanel {
         engine = Engine.newInstance(EngineOptions.newBuilder(HARDWARE_ACCELERATED)
                 .licenseKey("OK6AEKNYF2J46TGUSGVWFCL96HY8PYV11PUSURQ08A66MHBZA4TDH0Y6D09OZJ0L6BRGXSCIFY0F144KAMG1F7O5GHDM3PATIN4WNZCEGBXE0L3Y2UHDX3RGK4K1DSJUO9C6LYTJYAQG2NHON")
                 .build());
+        // Browser 객체를 Swing 컴포넌트로 표시할 수 있도록 구성한다.
         browser = engine.newBrowser(); // 탐색 브라우저
         BrowserView view = BrowserView.newInstance(browser); // swing에 표시하기 위함
 
@@ -55,6 +57,7 @@ public class MapPanel extends JPanel {
             lng 경도
             type 쓰레기통 타입, 이미지 쓰레기통 분류해서 보여줄 때 사용
          */
+        // 페이지가 완전히 로딩된 후에 마커를 추가한다.
         browser.navigation().on(LoadFinished.class, event -> { // 로딩 기다리기
             String script = String.format("addMarker('%s', %f, %f, %d)", title, lat, lng, type);
 //            System.out.println(script);

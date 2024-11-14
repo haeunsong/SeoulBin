@@ -12,7 +12,7 @@ import java.net.URL;
 public class TestServer {
     public static void main(String[] args) throws IOException {
         URL resource = TestServer.class.getClassLoader().getResource("map.html");
-        // 로컬 서버를 포트 8080에서 실행
+        // 로컬 서버를 포트 8088에서 실행
         HttpServer server = HttpServer.create(new InetSocketAddress(8088), 0);
         server.createContext("/map", exchange -> {
             File file = new File(resource.getFile());
@@ -40,3 +40,4 @@ public class TestServer {
         System.out.println("Server started on port 8088");
     }
 }
+

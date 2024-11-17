@@ -29,6 +29,20 @@ public class Main extends JFrame {
                 System.out.println("이벤트 테스트용 : "+ e.title);
             }
         });
+
+        JButton testButton = new JButton();
+        add(testButton, BorderLayout.NORTH);
+        
+        // resize와 addMarker가 작동하는지 테스트
+        testButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                setSize(500, 500);
+                mapPanel.resizeMap();
+                System.out.println(mapPanel.getSize().width);
+                mapPanel.addMarker("shku2", 37.4896, 126.8399, 0);
+            };
+        });
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -46,8 +60,6 @@ public class Main extends JFrame {
         }).run();
 
         new Main();
-        mapPanel.addMarker("shku", 37.4886, 126.8247, 0);
-        mapPanel.addMarker("shku1", 37.4886, 126.8297, 0);
     }
 }
 

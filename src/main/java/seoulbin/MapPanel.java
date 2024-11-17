@@ -13,10 +13,12 @@ import java.awt.*;
 import javax.swing.*;
 
 /*
-    addMarker(String title, double lat, double lng, int type) 등록
+    addMarker(String title, double lat, double lng, int type) 마커 등록
     deleteMarker(int index) 마커 삭제
+    resizeMap() -> 카카오맵 api 패널 지도 사이즈 변경 / 현재 패널 사이즈에 맞게 변경
+    / 그렇지만 카카오맵이 너무 커지면 로딩이 안됨 / 패널 사이즈 변경 시 스크롤 제거를 위함
 
-    마커 클릭 예시
+    마커 클릭 이벤트 예시
     mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
         @Override
         public void markerClicked(MarkerEvent e) { // MarkerEvent는 title, lat, lng, index, type정보를 갖고 있음
@@ -43,33 +45,53 @@ public class MapPanel extends JPanel {
                 .build());
         browser = engine.newBrowser(); // 탐색 브라우저
         BrowserView view = BrowserView.newInstance(browser); // swing에 표시하기 위함
-
         setLayout(new BorderLayout());
         add(view, BorderLayout.CENTER);
 
         browser.navigation().loadUrl("localhost:8088/map"); // page load
 
         browser.set(InjectJsCallback.class, params -> { // js 로딩전 콜백함수 삽입
-            JsObject window = params.frame().executeJavaScript("window");
-            window.putProperty("java", new JavaMarkerObject());
+            JsObject window = params.frame().executeJavaScript("window"); // window 객체 찾기
+            window.putProperty("java", new JavaMarkerObject()); // 윈도우에 삽입
             return InjectJsCallback.Response.proceed();
+        });
+
+        // 맵 로딩 전처리
+        preProcessing();
+    }
+
+    public void engineClose() { engine.close(); }
+
+    // 맵 크기 변경 시 사용 >> 스크롤 제거를 위함 // 사이즈 변경할 때마다 호출
+    public void resizeMap() {
+        SwingUtilities.invokeLater(() -> { // 스윙 변경사항 기다리기
+            Dimension size = getSize(); // 현재 패널사이즈 가져오기
+            String script = String.format("resizeMap(%d, %d)", size.width, size.height);
+//            System.out.println(script);
+            browser.mainFrame().ifPresent(frame -> {
+                frame.executeJavaScript(script); //자바스크립트 실행
+            });
         });
     }
 
-    public void engineClose() {
-        engine.close();
+    // 처음에 표시할 마커 로드
+    private void preProcessing() {
+        browser.navigation().on(LoadFinished.class, event -> {
+            resizeMap();
+            // addMarkers();
+            // 일단 테스트용
+            addMarker("shku", 37.4886, 126.8247, 0);
+            addMarker("shku1", 37.4886, 126.8297, 0);
+        });
     }
 
     public void addMarker(String title, double lat, double lng, int type) {
         /*
             title 이름, lat 위도, lng 경도, type 쓰레기통 타입, 이미지 쓰레기통 분류해서 보여줄 때 사용
         */
-        browser.navigation().on(LoadFinished.class, event -> { // 로딩 기다리기
-            String script = String.format("addMarker('%s', %f, %f, %d)", title, lat, lng, type);
-//            System.out.println(script);
-            browser.mainFrame().ifPresent(frame -> {
-                frame.executeJavaScript(script); //자바스크립트 실행
-            });
+        String script = String.format("addMarker('%s', %f, %f, %d)", title, lat, lng, type);
+        browser.mainFrame().ifPresent(frame -> {
+            frame.executeJavaScript(script); //자바스크립트 실행
         });
     }
 
@@ -80,6 +102,7 @@ public class MapPanel extends JPanel {
 //        addMarker()
     }
 
+    // 자바스크립트부터 자바로 데이터 받기
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
 
@@ -95,5 +118,6 @@ public class MapPanel extends JPanel {
     }
 
 }
+
 
 

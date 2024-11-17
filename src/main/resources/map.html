@@ -7,7 +7,7 @@
 </head>
 <body>
     <!--<h1>카카오맵 테스트</h1>-->
-    <div id="map" style="width:970px;height:745px;"></div>
+    <div id="map" style="width:970px; height:745px;"></div>
     <script>
         var mapContainer = document.getElementById('map'); // 지도를 표시할 div
         var mapOption = {
@@ -34,7 +34,7 @@
             })
 
             kakao.maps.event.addListener(marker, 'click', function() {
-                console.log(marker.getPosition().getLng());
+                // console.log(marker.getPosition().getLng());
                 var testIndex = 1;
                 window.java.callJavaMarkerEvent(testIndex, marker.getTitle(), marker.getPosition().getLat(), marker.getPosition().getLng(), 0);
             });
@@ -48,6 +48,14 @@
             markers.splice(index, 1);
         }
         // addMarker('skhu', 37.4878925, 126.825290, 0)
+
+        function resizeMap(width, height) {
+            const div = document.getElementById('map');
+            mapWidth = width - 19;
+            mapHeight = height - 19;
+            div.style.width = mapWidth + 'px';
+            div.style.height = mapHeight + 'px';
+        }
     </script>
 
 </body>

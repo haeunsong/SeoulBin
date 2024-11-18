@@ -9,14 +9,12 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 public class Main extends JFrame {
-    private static MapPanel mapPanel;
     private JLabel dateTimeLabel;
 
     public Main() {
         setSize(1000, 800);
         setLayout(new BorderLayout());
 
-        mapPanel = new MapPanel();
         // 왼쪽 패널 설정
         JPanel leftPanel = new JPanel();
         leftPanel.setPreferredSize(new Dimension(270, 800));
@@ -61,9 +59,6 @@ public class Main extends JFrame {
             }
         });
 
-//        add(mapPanel);
-        add(mapPanel, BorderLayout.CENTER);
-
         // 마커 클릭 예시
         mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
             @Override
@@ -72,7 +67,7 @@ public class Main extends JFrame {
             }
         });
 
-        JButton testButton = new JButton();
+        JButton testButton = new JButton("이거 누르면 마커 하나 더 생김" );
         add(testButton, BorderLayout.NORTH);
 
         // resize와 addMarker가 작동하는지 테스트

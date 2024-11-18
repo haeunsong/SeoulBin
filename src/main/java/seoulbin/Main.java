@@ -3,10 +3,14 @@ package seoulbin;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
+import java.time.format.    DateTimeFormatter;
 import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.Locale;
+import mapdata.utils;
+import java.util.Map;
+import java.util.List;
+
 
 public class Main extends JFrame {
     private JLabel dateTimeLabel;
@@ -14,6 +18,21 @@ public class Main extends JFrame {
     public Main() {
         setSize(1000, 800);
         setLayout(new BorderLayout());
+
+
+        //utils.allBinSelector 사용 예시
+
+
+        List<Map<String, Object>> binList = utils.allBinSelector();
+
+        for (Map<String, Object> binData : binList) {
+            System.out.println("Bin_Id: " + binData.get("bin_id") +
+                    ", Longitude: " + binData.get("longitude") +
+                    ", Latitude: " + binData.get("latitude") +
+                    ", Bin Type: " + binData.get("bin_type"));
+        }
+
+
 
         // 왼쪽 패널 설정
         JPanel leftPanel = new JPanel();

@@ -1,3 +1,7 @@
+**dependency  추가**
+** utils 순회 코드 (참고 자료) 추가**
+
+
 ```
 <repositories>
     <repository>
@@ -7,6 +11,12 @@
 </repositories>
 
 <dependencies>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.43.0.0</version>
+        </dependency>
+
     <dependency>
         <groupId>com.teamdev.jxbrowser</groupId>
         <artifactId>jxbrowser-win64</artifactId>

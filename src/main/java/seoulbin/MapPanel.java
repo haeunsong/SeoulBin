@@ -52,6 +52,9 @@ public class MapPanel extends JPanel {
                 .licenseKey("OK6AEKNYF2J46TGUSGVWFCL96HY8PYV11PUSURQ08A66MHBZA4TDH0Y6D09OZJ0L6BRGXSCIFY0F144KAMG1F7O5GHDM3PATIN4WNZCEGBXE0L3Y2UHDX3RGK4K1DSJUO9C6LYTJYAQG2NHON")
                 .build());
         browser = engine.newBrowser(); // 탐색 브라우저
+
+        browser.devTools().show();
+
         BrowserView view = BrowserView.newInstance(browser); // swing에 표시하기 위함
         setLayout(new BorderLayout());
         add(view, BorderLayout.CENTER);
@@ -125,6 +128,11 @@ public class MapPanel extends JPanel {
                     (double)binData.get("longitude"),
                     Integer.parseInt((String)binData.get("bin_type")));
         }
+    }
+    // 장소 검색
+    public void searchPlaces(String keyword) {
+        String script = String.format("searchPlaces('%s')", keyword.replace("'", "\\'")); // 안전한 문자열 처리
+        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
     }
 
     /**

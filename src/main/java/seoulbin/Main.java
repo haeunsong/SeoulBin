@@ -1,15 +1,21 @@
 package seoulbin;
 
+import org.json.JSONObject;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.format.    DateTimeFormatter;
 import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Scanner;
 
 public class Main extends JFrame {
     private JLabel dateTimeLabel;
+    MapPanel mapPanel;
 
     public Main() {
         setSize(1000, 800);
@@ -44,12 +50,26 @@ public class Main extends JFrame {
         searchButton.setBounds(20, 150, 80, 30);
         leftPanel.add(searchButton);
 
+        // 검색 버튼 이벤트 추가
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String keyword = searchField.getText().trim();
+                if (keyword.isEmpty()) {
+                    JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // JavaScript의 searchPlaces 함수 호출
+                    mapPanel.searchPlaces(keyword);
+                }
+            }
+        });
+
         // 오른쪽 패널 설정 (지도 표시 영역)
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setPreferredSize(new Dimension(730, 800));
 
         // 오른쪽 패널에 mapPanel 추가
-        MapPanel mapPanel = new MapPanel();
+        mapPanel = new MapPanel();
         rightPanel.add(mapPanel, BorderLayout.CENTER);
 
         // 윈도우 닫을 때 엔진 종료
@@ -95,6 +115,8 @@ public class Main extends JFrame {
         Timer timer = new Timer(1000, e -> dateTimeLabel.setText(getCurrentDateTime()));
         timer.start();
     }
+
+
 
     // 현재 날짜 및 시간 포맷
     private String getCurrentDateTime() {

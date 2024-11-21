@@ -25,30 +25,35 @@ function loadTrashBins(data) {
         console.error("Map is not initialized.");
         return;
     }
-    console.log("loadTrashBins() 호출됨");
-
     // 기존 마커 초기화
     markers.forEach(marker => marker.setMap(null));
     markers = [];
 
-    // 마커 이미지 설정
-    // const imageSrc = bin.type === 0
-    //     ? 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png' // 일반 쓰레기통
-    //     : 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_blue.png'; // 재활용 쓰레기통
-    // const imageSize = new kakao.maps.Size(36, 36); // 마커 이미지 크기
-    // const imageOption = { offset: new kakao.maps.Point(18, 36) }; // 마커 중심 좌표 설정
-    //
-    // const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+    console.log(data);
+    console.log("bin_type value:", data.bin_type); // 값 출력
+    console.log("bin_type type:", typeof data.bin_type); // 타입 확인
 
-    // 새로운 마커 추가
+    // 마커 이미지 설정
+
+
+    // // 새로운 마커 추가
     data.forEach(bin => {
         let type = bin.bin_type;
+
+        // data 가 배열이라서 무조건 순회하면서 값 추출해야함!
+        const imageSrc = type === "0"
+            ? 'general.png' // 일반 쓰레기통
+            : 'recycle.png'; // 재활용 쓰레기통
+        const imageSize = new kakao.maps.Size(36, 36); // 마커 이미지 크기
+        const imageOption = { offset: new kakao.maps.Point(18, 36) }; // 마커 중심 좌표 설정
+        const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
         const markerPosition = new kakao.maps.LatLng(bin.latitude, bin.longitude);
         const marker = new kakao.maps.Marker({
             map: map,
             position: markerPosition,
             title: bin.title,
-           // image: markerImage
+            image: markerImage
         });
         const infowindow = new kakao.maps.InfoWindow({
             content: `<div style="padding:5px;">${(type === "0" ? '일반쓰레기' : '재활용쓰레기')}</div>`

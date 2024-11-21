@@ -1,103 +1,173 @@
 package seoulbin;
-import java.awt.EventQueue;
+
+
+import seoulbin.stamp.StampPage;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.util.Locale;
 
-public class Main {
+public class Main extends JFrame {
+    private JPanel mainPanel;
+    private JLabel dateTimeLabel;
+    private MapPanel mapPanel;
+    private StampPage stampPage;
 
-	private JFrame frame;
-	private JPanel left_menu_bar;
-	private boolean isExpanded = false; 
-	private JLabel label1;
-    private JButton button1;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Main window = new Main();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}); 
-	}
+    public Main() {
+        setSize(1000, 800);
+        setLayout(new BorderLayout());
 
-	/**
-	 * Create the application.
-	 */
-	public Main() {
-		initialize();
-	}
+        mainPanel = new JPanel(new BorderLayout());
+        mapPanel = new MapPanel();
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 1000, 600);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+        // 왼쪽 패널 설정
+        JPanel leftPanel = new JPanel();
+        leftPanel.setPreferredSize(new Dimension(270, 800));
+        leftPanel.setLayout(null); // 절대 위치 배치
+        leftPanel.setBackground(Color.decode("#edede9"));
 
-		left_menu_bar = new JPanel();
-		left_menu_bar.setBackground(Color.LIGHT_GRAY);
-		left_menu_bar.setBounds(0, 0, 88, 600);
-		frame.getContentPane().add(left_menu_bar);
-		left_menu_bar.setLayout(null);
+        // 날짜 및 시간 표시 라벨
+        dateTimeLabel = new JLabel(getCurrentDateTime());
+        dateTimeLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        dateTimeLabel.setBounds(37, 20, 200, 40); // 두 줄로 표시되므로 높이 조정
+        leftPanel.add(dateTimeLabel);
 
-		// 메뉴바 아이콘 넣기
-		JLabel iconLabel = new JLabel();
-		iconLabel.setBounds(15, 10, 50, 50); // JLabel 크기 설정
+        // 검색 안내 라벨
+        JLabel searchLabel = new JLabel("원하는 위치를 검색하세요.");
+        searchLabel.setBounds(37, 80, 200, 20);
+        searchLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        leftPanel.add(searchLabel);
 
-		// 아이콘 이미지 불러와서 50x50 크기로 조정
-		ImageIcon icon = new ImageIcon(getClass().getResource("/menubar.png"));
-		Image scaledImage = icon.getImage().getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
-		iconLabel.setIcon(new ImageIcon(scaledImage));
+        // 검색 필드
+        JTextField searchField = new JTextField();
+        searchField.setBounds(35, 120, 200, 40);
+        searchField.setFont(new Font("Arial", Font.BOLD, 16));
+        leftPanel.add(searchField);
 
-		left_menu_bar.add(iconLabel);
-		
-		// 패널 내부의 라벨 및 버튼 초기화
-        label1 = new JLabel("확장된 상태에서 보이는 라벨");
-        label1.setBounds(10, 70, 150, 30);
-        label1.setVisible(false); // 초기에는 숨김
-        left_menu_bar.add(label1);
+        // ================ 검색 버튼  =================
+        JButton searchButton = new JButton("검색");
+        searchButton.setBounds(35, 160, 80, 30);
+        searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftPanel.add(searchButton);
 
-        button1 = new JButton("확장된 상태에서 보이는 버튼");
-        button1.setBounds(10, 110, 150, 30);
-        button1.setVisible(false); // 초기에는 숨김
-        left_menu_bar.add(button1);
+        // 검색 버튼 이벤트 추가
+        searchButton.addActionListener(e -> {
+            String keyword = searchField.getText().trim();
+            if (keyword.isEmpty()) {
+                JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
+            } else {
+                // JavaScript의 searchPlaces 함수 호출
+                mapPanel.searchPlaces(keyword);
+            }
+        });
 
-		// 아이콘에 마우스 클릭 이벤트 추가
-		iconLabel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				togglePanelSize();
-			}
-		});
+        // ================ 쓰레기통 추가 버튼  =================
+        // "쓰레기통 추가" 버튼 생성
+        JButton addBinButton = new JButton("쓰레기통 추가");
+        addBinButton.setBounds(35, 460, 200, 40); // 검색 버튼 아래에 위치
+        addBinButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftPanel.add(addBinButton);
 
-	}
-	// 패널 크기 토글 메서드
-	private void togglePanelSize() {
-		if (left_menu_bar == null) {
-            System.out.println("panel_1 is null!");
-            return; // panel_1이 null인 경우 실행하지 않음
-        }
-		if (isExpanded) {
-			left_menu_bar.setBounds(0, 0, 88, 600); // 축소 크기
-            label1.setVisible(false); // 축소 시 내부 컴포넌트 숨김
-            button1.setVisible(false);
-        } else {
-        	left_menu_bar.setBounds(0, 0, 200, 600); // 확장 크기
-            label1.setVisible(true); // 확장 시 내부 컴포넌트 표시
-            button1.setVisible(true);
-        }
-        isExpanded = !isExpanded;
-        frame.revalidate();
-        frame.repaint();
-	}
+        // "쓰레기통 추가" 버튼 이벤트
+        addBinButton.addActionListener(e -> mapPanel.enableBinAddingMode());
+
+        // ================ 쓰레기통 삭제 버튼  =================
+        JButton deleteBinButton = new JButton("쓰레기통 삭제");
+        deleteBinButton.setBounds(35, 500, 200, 40); // "쓰레기통 추가" 버튼 바로 아래에 위치
+        deleteBinButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftPanel.add(deleteBinButton);
+
+        // 오른쪽 패널 설정 (지도 표시 영역)
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.setPreferredSize(new Dimension(730, 800));
+
+        // 오른쪽 패널에 mapPanel 추가
+        rightPanel.add(mapPanel, BorderLayout.CENTER);
+
+        // "스탬프 페이지 이동" 버튼 생성
+        JButton stampPageButton = new JButton("스탬프 페이지");
+        stampPageButton.setBounds(35, 540, 200, 40);
+        stampPageButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftPanel.add(stampPageButton);
+
+        stampPageButton.addActionListener(e -> showStampPage());
+        stampPage = new StampPage(this);
+
+        // 윈도우 닫을 때 엔진 종료
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                mapPanel.engineClose();
+            }
+        });
+
+        // 마커 클릭 예시
+        mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
+            @Override
+            public void markerClicked(MarkerEvent e) { // MarkerEvent는 title, lat, lng, index, type정보를 갖고 있음
+                System.out.println("이벤트 테스트용 : "+ e.title);
+            }
+        });
+
+        // 프레임에 패널 추가
+        add(leftPanel, BorderLayout.WEST);
+        add(rightPanel, BorderLayout.CENTER);
+
+        mainPanel.add(leftPanel, BorderLayout.WEST);
+        mainPanel.add(rightPanel, BorderLayout.CENTER);
+
+        add(mainPanel);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        setVisible(true);
+
+        // 날짜와 시간을 주기적으로 업데이트하는 타이머
+        Timer timer = new Timer(1000, e -> dateTimeLabel.setText(getCurrentDateTime()));
+        timer.start();
+    }
+
+    public void showStampPage() {
+        getContentPane().removeAll();
+        add(stampPage);
+        revalidate();
+        repaint();
+    }
+
+//    // 메인 페이지로 복귀
+    public void showMainPage() {
+        getContentPane().removeAll();
+        add(mainPanel);
+        revalidate();
+        repaint();
+    }
+
+    // 현재 날짜 및 시간 포맷
+    private String getCurrentDateTime() {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd.E", Locale.KOREAN);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+
+        // HTML 태그로 줄바꿈 적용
+        return "<html>" + now.format(dateFormatter) + "<br>" + now.format(timeFormatter) + "</html>";
+    }
+
+    public static void main(String[] args) {
+        new Thread(() -> {
+            try {
+                // 로컬 HTTP 서버 시작
+                TestServer.main(null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).run();
+
+        new Main();
+    }
 }
+

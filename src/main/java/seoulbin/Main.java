@@ -1,6 +1,7 @@
 package seoulbin;
 
 import org.json.JSONObject;
+import seoulbin.stamp.StampPage;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,13 +15,17 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class Main extends JFrame {
+    private JPanel mainPanel;
     private JLabel dateTimeLabel;
-    MapPanel mapPanel;
+    private MapPanel mapPanel;
+    private StampPage stampPage;
 
     public Main() {
         setSize(1000, 800);
         setLayout(new BorderLayout());
 
+        // main Panel 생성
+        mainPanel = new JPanel(new BorderLayout());
 
         // 왼쪽 패널 설정
         JPanel leftPanel = new JPanel();
@@ -42,27 +47,33 @@ public class Main extends JFrame {
 
         // 검색 필드
         JTextField searchField = new JTextField();
-        searchField.setBounds(20, 110, 200, 30);
+        searchField.setBounds(20, 150, 200, 30);
         leftPanel.add(searchField);
 
-        // 검색 버튼
+        // ================ 검색 버튼  =================
         JButton searchButton = new JButton("검색");
         searchButton.setBounds(20, 150, 80, 30);
         leftPanel.add(searchButton);
 
         // 검색 버튼 이벤트 추가
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String keyword = searchField.getText().trim();
-                if (keyword.isEmpty()) {
-                    JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
-                } else {
-                    // JavaScript의 searchPlaces 함수 호출
-                    mapPanel.searchPlaces(keyword);
-                }
+        searchButton.addActionListener(e -> {
+            String keyword = searchField.getText().trim();
+            if (keyword.isEmpty()) {
+                JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
+            } else {
+                // JavaScript의 searchPlaces 함수 호출
+                mapPanel.searchPlaces(keyword);
             }
         });
+
+        // ================ 쓰레기통 추가 버튼  =================
+        // "쓰레기통 추가" 버튼 생성
+        JButton addBinButton = new JButton("쓰레기통 추가");
+        addBinButton.setBounds(20, 200, 120, 30); // 검색 버튼 아래에 위치
+        leftPanel.add(addBinButton);
+
+        // "쓰레기통 추가" 버튼 이벤트
+        addBinButton.addActionListener(e -> mapPanel.enableBinAddingMode());
 
         // 오른쪽 패널 설정 (지도 표시 영역)
         JPanel rightPanel = new JPanel(new BorderLayout());
@@ -71,6 +82,14 @@ public class Main extends JFrame {
         // 오른쪽 패널에 mapPanel 추가
         mapPanel = new MapPanel();
         rightPanel.add(mapPanel, BorderLayout.CENTER);
+
+        // "스탬프 페이지 이동" 버튼 생성
+        JButton stampPageButton = new JButton("스탬프 페이지 이동");
+        stampPageButton.setBounds(20, 250, 200, 30);
+        leftPanel.add(stampPageButton);
+
+        stampPageButton.addActionListener(e -> showStampPage());
+
 
         // 윈도우 닫을 때 엔진 종료
         addWindowListener(new WindowAdapter() {
@@ -106,6 +125,11 @@ public class Main extends JFrame {
         add(leftPanel, BorderLayout.WEST);
         add(rightPanel, BorderLayout.CENTER);
 
+        mainPanel.add(leftPanel, BorderLayout.WEST);
+        mainPanel.add(rightPanel, BorderLayout.CENTER);
+
+        add(mainPanel);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -116,7 +140,20 @@ public class Main extends JFrame {
         timer.start();
     }
 
+    public void showStampPage() {
+        getContentPane().removeAll();
+        add(stampPage);
+        revalidate();
+        repaint();
+    }
 
+//    // 메인 페이지로 복귀
+    public void showMainPage() {
+        getContentPane().removeAll();
+        add(mainPanel);
+        revalidate();
+        repaint();
+    }
 
     // 현재 날짜 및 시간 포맷
     private String getCurrentDateTime() {

@@ -146,7 +146,6 @@ public class MapPanel extends JPanel {
         @JsAccessible // 자바스크립트에서 호출
         public void callJavaMarkerEvent(int index, String title, double lat, double lng, int type) { // 자바스크립트 호출때 사용할 이름
             markerEvent = new MarkerEvent(index, title, lat, lng, type);
-//            System.out.println(markerEvent.title + " " + markerEvent.lat + ", " + markerEvent.lng);
 
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서

@@ -15,57 +15,89 @@ function initMap() {
     places = new kakao.maps.services.Places(map);
 
     console.log("intiMap() 호출됨");
-
-    // // 테스트 마커 추가
-    addMarker("테스트 마커", 37.5665, 126.9780, 0);
-    addMarker("테스트 마커2", 37.7666, 126.1834, 0);
-    addMarker("테스트 마커2", 37.3333, 126.2222, 1);
 }
 
-// 2. 쓰레기통 데이터 로드
+// 2. 쓰레기통 데이터 로드 및 마커 표시
+// {"bin_id":3437,"bin_type":"1","latitude":37.48328556,"longitude":126.8789442}
+// {"bin_id":3642,"bin_type":"0","latitude":37.4507049,"longitude":126.9085555}
 function loadTrashBins(data) {
     if (!map) {
         console.error("Map is not initialized.");
         return;
     }
     console.log("loadTrashBins() 호출됨");
+
+    // 기존 마커 초기화
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+
+    // 마커 이미지 설정
+    // const imageSrc = bin.type === 0
+    //     ? 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png' // 일반 쓰레기통
+    //     : 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_blue.png'; // 재활용 쓰레기통
+    // const imageSize = new kakao.maps.Size(36, 36); // 마커 이미지 크기
+    // const imageOption = { offset: new kakao.maps.Point(18, 36) }; // 마커 중심 좌표 설정
+    //
+    // const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+    // 새로운 마커 추가
     data.forEach(bin => {
-        addMarker(bin.title, bin.latitude, bin.longitude, bin.type);
+        let type = bin.bin_type;
+        const markerPosition = new kakao.maps.LatLng(bin.latitude, bin.longitude);
+        const marker = new kakao.maps.Marker({
+            map: map,
+            position: markerPosition,
+            title: bin.title,
+           // image: markerImage
+        });
+        const infowindow = new kakao.maps.InfoWindow({
+            content: `<div style="padding:5px;">${(type === "0" ? '일반쓰레기' : '재활용쓰레기')}</div>`
+        });
+
+        // 마우스를 올렸을 때 정보창 열기
+        kakao.maps.event.addListener(marker, 'mouseover', () => {
+            infowindow.open(map, marker);
+        });
+
+        // 마우스를 뗐을 때 정보창 닫기
+        kakao.maps.event.addListener(marker, 'mouseout', () => {
+            infowindow.close();
+        });
+        markers.push(marker);
     });
 
     console.log("All markers added to the map.");
 }
 
-// 2. 마커 추가 함수
-function addMarker(title, lat, lng, type) {
-    let imgSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png';
-    let imgSize = new kakao.maps.Size(64, 69);
-    let imgOption = {offset: new kakao.maps.Point(27, 69)};
-
-    let markerImage = new kakao.maps.MarkerImage(imgSrc, imgSize, imgOption);
-    let markerPosition = new kakao.maps.LatLng(lat, lng);
-
-    console.log(map);
-    let marker = new kakao.maps.Marker({
-        map: map,
-        position: markerPosition,
-        title: title,
-        //  image: markerImage,
-        type: type
-    });
-    console.log(marker);
-
-    let infowindow = new kakao.maps.InfoWindow({
-        content: `<div style="padding:5px;">${type === 0 ? '일반 쓰레기통' : '재활용 쓰레기통'}</div>`,
-        removable: true
-    });
-
-    kakao.maps.event.addListener(marker, 'click', function () {
-        infowindow.open(map, marker);
-    });
-
-    markers.push(marker);
-}
+// // 3. 마커 추가 함수
+// function addMarker(title, lat, lng, type) {
+//     // let imgSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png';
+//     // let imgSize = new kakao.maps.Size(64, 69);
+//     // let imgOption = {offset: new kakao.maps.Point(27, 69)};
+//
+//   //  let markerImage = new kakao.maps.MarkerImage(imgSrc, imgSize, imgOption);
+//     let markerPosition = new kakao.maps.LatLng(lat, lng);
+//
+//     console.log(map);
+//     let marker = new kakao.maps.Marker({
+//         position: markerPosition,
+//         map: map,
+//         title: title,
+//         //  image: markerImage,
+//         type: type
+//     });
+//
+//     let infowindow = new kakao.maps.InfoWindow({
+//         content: `<div style="padding:5px;">${type === 0 ? '일반 쓰레기통' : '재활용 쓰레기통'}</div>`,
+//         removable: true
+//     });
+//
+//     kakao.maps.event.addListener(marker, 'click', function () {
+//         infowindow.open(map, marker);
+//     });
+//
+//     markers.push(marker);
+// }
 
 // 3. 장소 검색
 function searchPlaces(keyword) {

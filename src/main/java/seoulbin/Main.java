@@ -115,20 +115,20 @@ public class Main extends JFrame {
                 System.out.println("이벤트 테스트용 : "+ e.title);
             }
         });
-
-        JButton testButton = new JButton("이거 누르면 마커 하나 더 생김" );
-        add(testButton, BorderLayout.NORTH);
-
-        // resize와 addMarker가 작동하는지 테스트
-        testButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                setSize(500, 500);
-                mapPanel.resizeMap();
-                System.out.println(mapPanel.getSize().width);
-                mapPanel.addMarker("shku2", 37.4896, 126.8399, 0);
-            };
-        });
+//
+//        JButton testButton = new JButton("이거 누르면 마커 하나 더 생김" );
+//        add(testButton, BorderLayout.NORTH);
+//
+//        // resize와 addMarker가 작동하는지 테스트
+//        testButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+////                setSize(500, 500);
+//                mapPanel.resizeMap();
+//                System.out.println(mapPanel.getSize().width);
+//                mapPanel.addMarker("shku2", 37.4896, 126.8399, 0);
+//            };
+//        });
 
         // 프레임에 패널 추가
         add(leftPanel, BorderLayout.WEST);

@@ -45,6 +45,59 @@ public class MapPanel extends JPanel {
         });
         preProcessing();
     }
+    private void preProcessing() {
+        try {
+            // 1. DB에서 데이터를 로드
+            binList = utils.allBinSelector();
+            if (binList.isEmpty()) {
+                System.out.println("No bin data found."); // 로그 추가
+                return;
+            }
+            // 2. 브라우저 로드 이벤트에서 지도 작업 실행
+            browser.navigation().on(LoadFinished.class, event -> {
+                if (binList == null || binList.isEmpty()) {
+                    System.err.println("No data to display on the map.");
+                    return;
+                }
+               // resizeMap();
+                 addMarkers();
+                // loadTrashBinData();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error during preProcessing: " + e.getMessage());
+        }
+    }
+
+    public void addMarkers() {
+        if (binList == null || binList.isEmpty()) {
+            System.out.println("No bins to add."); // 로그 추가
+            return;
+        }
+        for (Map<String, Object> binData : binList) {
+            try {
+                String binId = Integer.toString((int) binData.get("bin_id"));
+                double latitude = (double) binData.get("latitude");
+                double longitude = (double) binData.get("longitude");
+                int binType = Integer.parseInt(binData.get("bin_type").toString()); // 안전한 변환
+
+                addMarker(binId, latitude, longitude, binType);
+            } catch (Exception e) {
+                System.err.println("Error adding marker: " + e.getMessage());
+            }
+        }
+    }
+
+    public void loadTrashBinData() {
+        List<Map<String, Object>> binData = utils.allBinSelector();
+        String jsonData = new Gson().toJson(binData);
+        browser.mainFrame().ifPresent(frame -> {
+            // initMap 실행 후 loadTrashBins 실행
+            frame.executeJavaScript("initMap();");
+            frame.executeJavaScript("loadTrashBins(" + jsonData + ");");
+        });
+
+    }
 
     // 마커 클릭 이벤트 인터페이스 구현
     public void addMarkerClickEventListener(MarkerClickEventListener markerClickEventListener) {
@@ -65,30 +118,8 @@ public class MapPanel extends JPanel {
             });
         });
     }
-    private void preProcessing() {
-        binList = utils.allBinSelector();
 
-        browser.navigation().on(LoadFinished.class, event -> {
-            resizeMap();
-            addMarkers();
-        });
-    }
-    public void addMarkers() {
-        /*
-            처음 배열 받아서, 만들기용
-        */
-        for (Map<String, Object> binData : binList) {
-//            System.out.println("Bin_Id: " + binData.get("bin_id") +
-//                    ", Longitude: " + binData.get("longitude") +
-//                    ", Latitude: " + binData.get("latitude") +
-//                    ", Bin Type: " + binData.get("bin_type"));
-            addMarker(Integer.toString(
-                            (int) binData.get("bin_id")),
-                    (double) binData.get("latitude"),
-                    (double) binData.get("longitude"),
-                    Integer.parseInt((String) binData.get("bin_type")));
-        }
-    }
+
 
     // ================ 장소 검색  =================
     public void searchPlaces(String keyword) {
@@ -99,12 +130,6 @@ public class MapPanel extends JPanel {
     // ================  쓰레기통 추가  =================
     public void enableBinAddingMode() {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
-    }
-
-    public void loadTrashBinData() {
-        List<Map<String, Object>> binData = utils.allBinSelector();
-        String jsonData = new Gson().toJson(binData);
-        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("loadTrashBins(" + jsonData + ");"));
     }
 
     public void addMarker(String title, double lat, double lng, int type) {

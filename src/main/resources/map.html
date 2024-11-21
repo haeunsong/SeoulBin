@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>카카오맵 API 테스트</title>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4eae4d5ae64024c4ab8a3c31c920d370&libraries=services"></script>
-    <script src="mapUtils.js" defer></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4eae4d5ae64024c4ab8a3c31c920d370&libraries=services" ></script>
+    <script src="./app.js" defer></script>
     <style>
-        #mapwrap { position: relative; overflow: hidden; }
+        #map{width:970px;height:745px;}
         .category, .category * { margin: 0; padding: 0; color: #000; }
         .category { position: absolute; top: 10px; left: 10px; z-index: 10; background-color: #fff; border: 1px solid black; }
         .category ul { list-style: none; display: flex; padding: 5px; }
@@ -15,9 +15,7 @@
     </style>
 </head>
 <body>
-<div id="mapwrap">
-    <div id="map" style="width:970px; height:745px;"></div>
-    <!-- 지도 위에 표시될 마커 카테고리 -->
+    <div id="map"></div>
     <div class="category">
         <ul>
             <li id="all" class="active" onclick="filterMarkers('all')">전체</li>
@@ -25,130 +23,5 @@
             <li id="recycle" onclick="filterMarkers(1)">재활용</li>
         </ul>
     </div>
-</div>
-
-<script>
-    let map;
-    let places;
-    let markers = [];
-
-    // 1. 맵 초기화
-    function initMap() {
-        const mapContainer = document.getElementById('map');
-        const mapOptions = {
-            center: new kakao.maps.LatLng(37.4878925, 126.8252908),
-            level: 5
-        };
-        map = new kakao.maps.Map(mapContainer, mapOptions);
-        map.setLevel(5);
-        places = new kakao.maps.services.Places(map);
-
-
-    }
-    // ================= 맵 초기화 ========================
-    document.addEventListener("DOMContentLoaded",initMap);
-
-
-    // ================= Kakao Places API 검색 =====================
-    function searchPlaces(keyword) {
-        // places.keywordSearch(keyword, function (result, status) {
-        //     if (status === kakao.maps.services.Status.OK) {
-        //         let place = result[0];
-        //         let lat = place.y;
-        //         let lng = place.x;
-        //         let name = place.place_name;
-        //
-        //         console.log("검색 결과:", name, lat, lng);
-        //
-        //         let position = new kakao.maps.LatLng(lat, lng);
-        //         map.setCenter(position);
-        //         addMarker(name, lat, lng, null); // 검색된 장소는 type을 설정하지 않음
-        //     } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-        //         alert("검색 결과가 없습니다.");
-        //     } else if (status === kakao.maps.services.Status.ERROR) {
-        //         alert("검색 중 오류가 발생했습니다.");
-        //     }
-        // });
-        places.keywordSearch(keyword, (result, status) => {
-            if (status === kakao.maps.services.Status.OK) {
-                console.log("Search results:", result);
-                // 검색 결과를 지도에 표시하는 로직 추가
-                result.forEach(place => {
-                    const marker = new kakao.maps.Marker({
-                        position: new kakao.maps.LatLng(place.y, place.x),
-                        map: map
-                    });
-                });
-            } else {
-                console.log("Search failed with status:", status);
-            }
-        });
-    }
-
-
-
-    // 마커 필터링 함수
-    function filterMarkers(type) {
-        markers.forEach(marker => {
-            if (type === 'all' || marker.type === type) {
-                marker.setMap(map); // 지도에 표시
-            } else {
-                marker.setMap(null); // 지도에서 제거
-            }
-        });
-
-        // 카테고리 버튼 스타일 업데이트
-        document.querySelectorAll('.category li').forEach(li => li.classList.remove('active'));
-        document.getElementById(type === 'all' ? 'all' : type === 0 ? 'general' : 'recycle').classList.add('active');
-    }
-
-
-    // 지도 클릭 이벤트
-    kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
-        if (isBinAddingMode) {
-            let lat = mouseEvent.latLng.getLat();
-            let lng = mouseEvent.latLng.getLng();
-            console.log("Clicked location:", lat, lng);
-
-            // Java 객체와의 통신
-            window.java.addBin(lat, lng);
-
-            isBinAddingMode = false; // 모드 종료
-        }
-    });
-
-    // 쓰레기통 데이터 로드
-    function loadTrashBins(data) {
-        data.forEach(bin => {
-            addMarker(bin.title, bin.latitude, bin.longitude, bin.type);
-        });
-    }
-
-
-    // 검색 버튼 예시
-    function initSearchButton() {
-        let searchButton = document.createElement('button');
-        searchButton.id = 'searchButton';
-        searchButton.innerText = "검색";
-        searchButton.style.position = "absolute";
-        searchButton.style.top = "10px";
-        searchButton.style.right = "10px";
-        searchButton.onclick = function () {
-            let keyword = prompt("검색할 장소를 입력하세요:");
-            if (keyword) {
-                searchPlaces(keyword);
-            }
-        };
-        document.body.appendChild(searchButton);
-    }
-
-    // 초기화
-    function init() {
-        initSearchButton();
-    }
-
-    // 페이지 로드 후 초기화
-    window.onload = init;
-</script>
 </body>
 </html>

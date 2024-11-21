@@ -34,6 +34,26 @@ public class TestServer {
             os.write(fileBytes);
             os.close();
         });
+        server.createContext("/app.js", exchange -> {
+            File file = new File("src/main/resources/app.js");
+            if (!file.exists()) {
+                String response = "404\n";
+                exchange.sendResponseHeaders(404, response.length());
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+                return;
+            }
+
+            FileInputStream fis = new FileInputStream(file);
+            byte[] fileBytes = fis.readAllBytes();
+            fis.close();
+
+            exchange.sendResponseHeaders(200, fileBytes.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(fileBytes);
+            os.close();
+        });
 
         server.setExecutor(null);
         server.start();

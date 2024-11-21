@@ -72,60 +72,6 @@ public class MapPanel extends JPanel {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
     }
 
-//    // 1. preProcessing
-//    private void preProcessing() {
-//        try {
-//            // 1. DB에서 데이터를 로드
-//            binList = utils.allBinSelector();
-//            if (binList.isEmpty()) {
-//                System.out.println("No bin data found."); // 로그 추가
-//                return;
-//            }
-//            // 2. 브라우저 로드 이벤트에서 지도 작업 실행
-//            browser.navigation().on(LoadFinished.class, event -> {
-//                if (binList == null || binList.isEmpty()) {
-//                    System.err.println("No data to display on the map.");
-//                    return;
-//                }
-//                //resizeMap();
-//                addMarkers();
-//            });
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            System.err.println("Error during preProcessing: " + e.getMessage());
-//        }
-//    }
-
-//    // 2. addMarkers()
-//    public void addMarkers() {
-//        if (binList == null || binList.isEmpty()) {
-//            System.out.println("No bins to add."); // 로그 추가
-//            return;
-//        }
-//        for (Map<String, Object> binData : binList) {
-//            try {
-//                String binId = Integer.toString((int) binData.get("bin_id"));
-//                double latitude = (double) binData.get("latitude");
-//                double longitude = (double) binData.get("longitude");
-//                int binType = Integer.parseInt(binData.get("bin_type").toString()); // 안전한 변환
-//
-//                // addMarker 실행
-//                addMarker(binId, latitude, longitude, binType);
-//            } catch (Exception e) {
-//                System.err.println("Error adding marker: " + e.getMessage());
-//            }
-//        }
-//
-//        //loadTrashBinData();
-//    }
-
-//    public void addMarker(String title, double lat, double lng, int type) {
-//        String script = String.format("addMarker('%s', %f, %f, %d)", title, lat, lng, type);
-//        browser.mainFrame().ifPresent(frame -> {
-//            frame.executeJavaScript(script); //자바스크립트 실행
-//        });
-//    }
-
     // 마커 클릭 이벤트 인터페이스 구현
     public void addMarkerClickEventListener(MarkerClickEventListener markerClickEventListener) {
         this.markerClickEventListener = markerClickEventListener;
@@ -145,9 +91,6 @@ public class MapPanel extends JPanel {
             });
         });
     }
-
-
-
 
     // ================  쓰레기통 추가  =================
     public void enableBinAddingMode() {

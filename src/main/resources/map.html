@@ -8,9 +8,9 @@
     <style>
         #map{width:970px;height:745px;}
         .category, .category * { margin: 0; padding: 0; color: #000; }
-        .category { position: absolute; top: 10px; left: 10px; z-index: 10; background-color: #fff; border: 1px solid black; }
+        .category { position: absolute; top: 10px; left: 10px; z-index: 10; background-color: #fff;}
         .category ul { list-style: none; display: flex; padding: 5px; }
-        .category li { cursor: pointer; margin: 0 5px; padding: 5px 10px; border: 1px solid black; background-color: #f9f9f9; }
+        .category li { cursor: pointer; margin: 0 5px; padding: 5px 10px; }
         .category li.active { background-color: #ff5f4a; color: #fff; }
     </style>
 </head>
@@ -19,8 +19,8 @@
     <div class="category">
         <ul>
             <li id="all" class="active" onclick="filterMarkers('all')">전체</li>
-            <li id="general" onclick="filterMarkers(0)">일반</li>
-            <li id="recycle" onclick="filterMarkers(1)">재활용</li>
+            <li id="general" onclick="filterMarkers('general')">일반</li>
+            <li id="recycle" onclick="filterMarkers('recycle')">재활용</li>
         </ul>
     </div>
 </body>

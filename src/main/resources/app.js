@@ -48,6 +48,8 @@ function loadTrashBins(data) {
             title: bin.title,
             image: markerImage
         });
+        // maker 에 type 추가 - 필터링 시 이용
+        marker.type = type === "0" ? "general" : "recycle";
         const infowindow = new kakao.maps.InfoWindow({
             content: `<div style="padding:5px;">${(type === "0" ? '일반쓰레기' : '재활용쓰레기')}</div>`
         });
@@ -98,23 +100,24 @@ function clearMarkers() {
     searchMarkers = []; // 배열 초기화
 }
 
-document.addEventListener("DOMContentLoaded", initMap);
-
-
-// ================= 맵 초기화 ========================
-
-
 // 마커 필터링 함수
 function filterMarkers(type) {
     markers.forEach(marker => {
-        if (type === 'all' || marker.type === type) {
+        console.log(map);
+        if (type === 'all') {
             marker.setMap(map); // 지도에 표시
-        } else {
-            marker.setMap(null); // 지도에서 제거
+        } else if(marker.type === type) {
+            marker.setMap(map);
+        }else {
+            marker.setMap(null);
         }
     });
 
     // 카테고리 버튼 스타일 업데이트
     document.querySelectorAll('.category li').forEach(li => li.classList.remove('active'));
-    document.getElementById(type === 'all' ? 'all' : type === 0 ? 'general' : 'recycle').classList.add('active');
+    document.getElementById(type === 'all' ? 'all' : type === 'general' ? 'general' : 'recycle').classList.add('active');
 }
+
+// ================= 맵 초기화 ========================
+document.addEventListener("DOMContentLoaded", initMap);
+

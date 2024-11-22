@@ -35,26 +35,26 @@ public class Main extends JFrame {
 
         // 날짜 및 시간 표시 라벨
         dateTimeLabel = new JLabel(getCurrentDateTime());
-        dateTimeLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        dateTimeLabel.setBounds(37, 20, 200, 40); // 두 줄로 표시되므로 높이 조정
+        dateTimeLabel.setFont(new Font("Malgun gothic", Font.BOLD, 20));
+        dateTimeLabel.setBounds(37, 20, 200, 50); // 두 줄로 표시되므로 높이 조정
         leftPanel.add(dateTimeLabel);
 
         // 검색 안내 라벨
         JLabel searchLabel = new JLabel("원하는 위치를 검색하세요.");
         searchLabel.setBounds(37, 80, 200, 20);
-        searchLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        searchLabel.setFont(new Font("Malgun gothic", Font.BOLD, 16));
         leftPanel.add(searchLabel);
 
         // 검색 필드
         JTextField searchField = new JTextField();
         searchField.setBounds(35, 120, 200, 40);
-        searchField.setFont(new Font("Arial", Font.BOLD, 16));
+        searchField.setFont(new Font("Malgun gothic", Font.BOLD, 16));
         leftPanel.add(searchField);
 
         // ================ 검색 버튼  =================
         JButton searchButton = new JButton("검색");
         searchButton.setBounds(35, 160, 80, 30);
-        searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        searchButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(searchButton);
 
         // 검색 버튼 이벤트 추가
@@ -72,7 +72,7 @@ public class Main extends JFrame {
         // "쓰레기통 추가" 버튼 생성
         JButton addBinButton = new JButton("쓰레기통 추가");
         addBinButton.setBounds(35, 460, 200, 40); // 검색 버튼 아래에 위치
-        addBinButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        addBinButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(addBinButton);
 
         // "쓰레기통 추가" 버튼 이벤트
@@ -81,7 +81,7 @@ public class Main extends JFrame {
         // ================ 쓰레기통 삭제 버튼  =================
         JButton deleteBinButton = new JButton("쓰레기통 삭제");
         deleteBinButton.setBounds(35, 500, 200, 40); // "쓰레기통 추가" 버튼 바로 아래에 위치
-        deleteBinButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        deleteBinButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(deleteBinButton);
 
         // 오른쪽 패널 설정 (지도 표시 영역)
@@ -94,7 +94,7 @@ public class Main extends JFrame {
         // "스탬프 페이지 이동" 버튼 생성
         JButton stampPageButton = new JButton("스탬프 페이지");
         stampPageButton.setBounds(35, 540, 200, 40);
-        stampPageButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        stampPageButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(stampPageButton);
 
         stampPageButton.addActionListener(e -> showStampPage());

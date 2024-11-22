@@ -18,7 +18,7 @@ public class StampPage extends JPanel {
     public StampPage(Main mainFrame) {
 
         // JOptionPane 텍스트 글꼴 및 크기 설정
-        UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, 20)); // 텍스트
+        UIManager.put("OptionPane.messageFont", new Font("Malgun gothic", Font.BOLD, 20)); // 텍스트
        // UIManager.put("OptionPane.buttonFont", new Font("Arial", Font.PLAIN, 18)); // 버튼 텍스트
 
         this.mainFrame = mainFrame;

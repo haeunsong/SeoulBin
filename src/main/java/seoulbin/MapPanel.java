@@ -64,6 +64,8 @@ public class MapPanel extends JPanel {
         browser.mainFrame().ifPresent(frame -> {
             frame.executeJavaScript(String.format("loadTrashBins(%s);", jsonData));
         });
+        
+        resizeMap();
     }
 
     // ================ 장소 검색  =================
@@ -95,14 +97,6 @@ public class MapPanel extends JPanel {
     // ================  쓰레기통 추가  =================
     public void enableBinAddingMode() {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
-    }
-
-
-    public void setCenter(double lat, double lng) {
-        String script = String.format("setCenter(%f, %f)", lat, lng);
-        browser.mainFrame().ifPresent(frame -> {
-            frame.executeJavaScript(script); //자바스크립트 실행
-        });
     }
 
     public final class JavaMarkerObject {

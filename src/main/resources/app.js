@@ -118,6 +118,15 @@ function filterMarkers(type) {
     document.getElementById(type === 'all' ? 'all' : type === 'general' ? 'general' : 'recycle').classList.add('active');
 }
 
+// 맵 사이즈 변경
+function resizeMap(width, height) {
+        const div = document.getElementById('map');
+        mapWidth = width - 19;
+        mapHeight = height - 19;
+        div.style.width = mapWidth + 'px';
+        div.style.height = mapHeight + 'px';
+}
+		
 // ================= 맵 초기화 ========================
 document.addEventListener("DOMContentLoaded", initMap);
 

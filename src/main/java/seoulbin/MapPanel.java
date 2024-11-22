@@ -98,6 +98,13 @@ public class MapPanel extends JPanel {
     public void enableBinAddingMode() {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
     }
+    // ================ 마커 찍기 모드 비활성화 =================
+    public void disableBinAddingMode() {
+    	browser.mainFrame().ifPresent(frame -> frame.executeJavaScript());
+    	isAddingBin = false;  // 마커 추가 모드 비활성화
+        System.out.println("마커 추가 모드 종료");
+    }
+    
 
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;

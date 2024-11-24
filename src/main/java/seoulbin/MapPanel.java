@@ -85,6 +85,13 @@ public class MapPanel extends JPanel {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
     }
 
+    //================  쓰레기통 삭제  =================
+    public void deleteBin(int bin_id) {
+        int result = utils.deleteBinData(bin_id);
+
+//        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+    }
+
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
 
@@ -97,30 +104,30 @@ public class MapPanel extends JPanel {
             }
         }
 
-        @JsAccessible
-        public void addBin(double lat, double lng) {
-            SwingUtilities.invokeLater(() -> {
-                int type = JOptionPane.showOptionDialog(
-                        null,
-                        "추가할 쓰레기통의 타입을 선택하세요:",
-                        "쓰레기통 추가",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new String[]{"일반", "재활용"},
-                        "일반"
-                );
-
-                if (type == JOptionPane.CLOSED_OPTION) return;
-
-                int result = utils.addBinData(lat, lng, type);
-                if (result == 0) {
-                    JOptionPane.showMessageDialog(null, "쓰레기통이 성공적으로 추가되었습니다!");
-                    loadTrashBinData();
-                } else {
-                    JOptionPane.showMessageDialog(null, "쓰레기통 추가에 실패했습니다.");
-                }
-            });
-        }
+//        @JsAccessible
+//        public void addBin(double lat, double lng) {
+//            SwingUtilities.invokeLater(() -> {
+//                int type = JOptionPane.showOptionDialog(
+//                        null,
+//                        "추가할 쓰레기통의 타입을 선택하세요:",
+//                        "쓰레기통 추가",
+//                        JOptionPane.DEFAULT_OPTION,
+//                        JOptionPane.QUESTION_MESSAGE,
+//                        null,
+//                        new String[]{"일반", "재활용"},
+//                        "일반"
+//                );
+//
+//                if (type == JOptionPane.CLOSED_OPTION) return;
+//
+//                int result = utils.addBinData(lat, lng, type);
+//                if (result == 0) {
+//                    JOptionPane.showMessageDialog(null, "쓰레기통이 성공적으로 추가되었습니다!");
+//                    loadTrashBinData();
+//                } else {
+//                    JOptionPane.showMessageDialog(null, "쓰레기통 추가에 실패했습니다.");
+//                }
+//            });
+//        }
     }
 }

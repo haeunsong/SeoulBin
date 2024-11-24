@@ -92,7 +92,8 @@ public class Main extends JFrame {
                         "정말 삭제하시겠습니까?", "Mesaage", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     // 삭제하는 부분
-                    System.out.println(markerIndex + "삭제");
+//                    System.out.println(markerIndex + "삭제");
+                    mapPanel.deleteBin(markerIndex);
                     markerIndex = null;
                     // 쓰레기통 로딩 다시
                     mapPanel.loadTrashBinData();

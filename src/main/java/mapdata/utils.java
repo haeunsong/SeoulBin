@@ -18,6 +18,7 @@ public class utils {
     Param: None
     desc: DB에서 데이터를 조회하고, 조회된 데이터를 반환
     return: List<Map<String, Object>> 형식의 데이터 목록 반환
+    <bin_id, longitude, latitude, bin_type, detail, city>
     */
 
     public static List<Map<String, Object>> allBinSelector() {
@@ -26,7 +27,7 @@ public class utils {
             String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
             Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT bin_id, longitude, latitude, bin_type FROM binlist");
+            ResultSet rs = stmt.executeQuery("SELECT bin_id, longitude, latitude, bin_type, detail, city FROM binlist");
 
             // ResultSet에서 데이터를 가져와서 List에 저장
             while (rs.next()) {
@@ -35,6 +36,8 @@ public class utils {
                 binData.put("longitude", rs.getDouble("longitude"));
                 binData.put("latitude", rs.getDouble("latitude"));
                 binData.put("bin_type", rs.getString("bin_type"));
+                binData.put("detail", rs.getString("detail"));
+                binData.put("city", rs.getString("city"));
                 binList.add(binData);
             }
 
@@ -77,14 +80,14 @@ public class utils {
 
     /*
     name: addBinData
-    Param: double latitude, double longitude, int binType
+    Param: double latitude, double longitude, int binType, String detail, String city
     desc: binList_tmp(임시 리스트) 테이블에 추가
     return: 0 if success, -1 if failure
     */
 
-    public static int addBinData(double latitude, double longitude, int binType) {
+    public static int addBinData(double latitude, double longitude, int binType, String detail, String city) {
         String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
-        String insertQuery = "INSERT INTO binlist_tmp (latitude, longitude, bin_type) values (?,?,?)";
+        String insertQuery = "INSERT INTO binlist (latitude, longitude, bin_type, detail, city) values (?,?,?,?,?)";
 
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -94,6 +97,8 @@ public class utils {
             pstmt.setDouble(1, latitude);
             pstmt.setDouble(2, longitude);
             pstmt.setInt(3, binType);
+            pstmt.setString(4, detail);
+            pstmt.setString(5, city);
 
             // 쿼리 실행
             int rowsAffected = pstmt.executeUpdate();
@@ -166,6 +171,38 @@ public class utils {
             // 데이터 추가 성공 여부 확인
             if (rowsAffected > 0) {
                 System.out.println("Data inserted successfully.");
+                return 0; // 성공
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // 실패
+    }
+
+    /*
+        name: deleteBinData
+        Param: double latitude, double longitude, int bin_type
+        desc: binList에서 Bin 삭제
+        return: 0 if success, -1 if failure
+    */
+    public static int deleteBinData(double latitude, double longitude, int bin_type) {
+        String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
+        String deleteQuery = "DELETE FROM binList WHERE latitude = ? AND longitude = ? AND bin_type = ?";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
+
+            // PreparedStatement에 값 설정
+            pstmt.setDouble(1, latitude);
+            pstmt.setDouble(2, longitude);
+            pstmt.setInt(3, bin_type);
+
+            // 쿼리 실행
+            int rowsAffected = pstmt.executeUpdate();
+
+            // 데이터 추가 성공 여부 확인
+            if (rowsAffected > 0) {
+                System.out.println("Data Delete successfully.");
                 return 0; // 성공
             }
         } catch (SQLException e) {

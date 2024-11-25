@@ -11,7 +11,7 @@ import com.teamdev.jxbrowser.js.JsAccessible;
 import com.teamdev.jxbrowser.js.JsObject;
 import com.teamdev.jxbrowser.navigation.event.*;
 import com.teamdev.jxbrowser.view.swing.BrowserView;
-import mapdata.utils;
+import mapdata.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,7 +57,7 @@ public class MapPanel extends JPanel {
     }
     // ================ 전체 쓰레기통 위치 불러오기 + 마커 표시  =================
     public void loadTrashBinData() {
-        List<Map<String, Object>> binData = utils.allBinSelector();
+        List<Map<String, Object>> binData = Utils.allBinSelector();
         // {"bin_id":3437,"bin_type":"1","latitude":37.48328556,"longitude":126.8789442}
         String jsonData = new Gson().toJson(binData);
 
@@ -133,7 +133,7 @@ public class MapPanel extends JPanel {
 
                 if (type == JOptionPane.CLOSED_OPTION) return;
 
-                int result = utils.addBinData(lat, lng, type);
+                int result = Utils.addBinData(lat, lng, type);
                 if (result == 0) {
                     JOptionPane.showMessageDialog(null, "쓰레기통이 성공적으로 추가되었습니다!");
                     loadTrashBinData();

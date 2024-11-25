@@ -21,7 +21,9 @@ class AddBtnAction extends JFrame {
     private File selectedImageFile;
 
     // 임의로 받은 주소 (이 부분은 실제 지도에서 받은 값을 대체해야 함)
-    private String receivedAddress = "서울특별시 강남구 테헤란로 123";
+    private String receivedAddress;
+    private double lat;
+    private double lng;
     
  // 선택된 체크박스 값 처리 함수
     private int getCheckBoxValue(JCheckBox checkBox1, JCheckBox checkBox2) {
@@ -35,8 +37,11 @@ class AddBtnAction extends JFrame {
         	return 3; // 없을때.
         }
     }
-    
-    public AddBtnAction() {
+ // 외부에서 주소를 전달받을 수 있도록 하는 메서드
+    public AddBtnAction(double lat, double lng,String address) {
+    	this.lat=lat;
+    	this.lng=lng;
+    	this.receivedAddress=address;
         // 서브 프레임 설정
         setTitle("추가");
         
@@ -212,11 +217,11 @@ class AddBtnAction extends JFrame {
                         break;
                 }
                 
-                //String imagePath = ((ImageIcon) imageIcon).getDescription();
+                String imagePath = selectedImageFile != null ? selectedImageFile.getAbsolutePath() : "default_image_path";
                 // 데베에 전달: 주소, 체크박스 체크여부 2개, 이미지 경로 
-                //if(getCheckBoxValue(checkBox1,checkBox2)==0||getCheckBoxValue(checkBox1,checkBox2)==1||getCheckBoxValue(checkBox1,checkBox2)==2) {
-                	//saveAddBin(getCheckBoxValue(checkBox1,checkBox2), receivedAddress, imagePath);
-                //}
+                if(getCheckBoxValue(checkBox1,checkBox2)==0||getCheckBoxValue(checkBox1,checkBox2)==1||getCheckBoxValue(checkBox1,checkBox2)==2) {
+                	saveAddBin(getCheckBoxValue(checkBox1,checkBox2), receivedAddress, imagePath);
+                }
                 System.out.println("데이터 베이스에 전달"); // 확인용
                 
                 String message = "주소: " + receivedAddress + "\n" +

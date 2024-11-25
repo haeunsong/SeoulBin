@@ -120,7 +120,7 @@ public class MapPanel extends JPanel {
             }
         }
 
-        @JsAccessible
+       /* @JsAccessible
         public void addBin(double lat, double lng) {
             SwingUtilities.invokeLater(() -> {
                 int type = JOptionPane.showOptionDialog(
@@ -143,7 +143,11 @@ public class MapPanel extends JPanel {
                 } else {
                     JOptionPane.showMessageDialog(null, "쓰레기통 추가에 실패했습니다.");
                 }
-            });
+            });*/
+        @JsAccessible // 자바스크립트에서 호출
+        public void showAddBinDialog(double lat, double lng,String address) {
+            // 기존 AddBtnAction을 호출하는 코드
+            new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
     }
 }

@@ -67,6 +67,16 @@ public class Main extends JFrame {
                 mapPanel.searchPlaces(keyword);
             }
         });
+        // "현재 위치" 버튼 추가
+        JButton currentLocationButton = new JButton("현재 위치");
+        currentLocationButton.setBounds(35, 200, 200, 40);
+        currentLocationButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftPanel.add(currentLocationButton);
+
+        // 현재 위치 버튼 이벤트
+        currentLocationButton.addActionListener(e -> {
+            mapPanel.getCurrentLocation();
+        });
 
         // ================ 쓰레기통 추가 버튼  =================
         // "쓰레기통 추가" 버튼 생성

@@ -1,5 +1,7 @@
 package mapdata;
 
+import model.Model;
+
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ public class Utils {
     private static Connection connection;
 
     public static Connection getConnection() throws SQLException {
-        String url = "jdbc:sqlite:src/main/java/database/seoulbinstamp.sqlite3";
+        String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
         return DriverManager.getConnection(url);
     }
 
@@ -29,18 +31,21 @@ public class Utils {
     */
     public static List<Map<String, Object>> allBinSelector() {
         List<Map<String, Object>> binList = new ArrayList<>();
-        String query = "SELECT bin_id, longitude, latitude, bin_type FROM binlist";
+        String query = "SELECT bin_id, longitude, latitude, bin_type, detail, city FROM binlist";
 
         try (Connection conn = Utils.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
+            // ResultSet에서 데이터를 가져와서 List에 저장
             while (rs.next()) {
                 Map<String, Object> binData = new HashMap<>();
                 binData.put("bin_id", rs.getInt("bin_id"));
                 binData.put("longitude", rs.getDouble("longitude"));
                 binData.put("latitude", rs.getDouble("latitude"));
                 binData.put("bin_type", rs.getString("bin_type"));
+                binData.put("detail", rs.getString("detail"));
+                binData.put("city", rs.getString("city"));
                 binList.add(binData);
             }
 
@@ -76,37 +81,42 @@ public class Utils {
         return 0; // 성공
     }
 
-    /*
+       /*
     name: addBinData
-    Param: double latitude, double longitude, int binType
+    Param: double latitude, double longitude, int binType, String detail, String city
     desc: binList_tmp(임시 리스트) 테이블에 추가
     return: 0 if success, -1 if failure
     */
+    public static int addBinData(double latitude, double longitude, int binType, String detail, String city, String imagePath) {
 
-    public static int addBinData(double latitude, double longitude, int binType) {
-        String insertQuery = "INSERT INTO binlist_tmp (latitude, longitude, bin_type) values (?,?,?)";
+        String insertQuery = "INSERT INTO binlist (latitude, longitude, bin_type, detail, city) values (?,?,?,?,?)";
 
+        if (Model.isBin(imagePath) == 1) {
+            try (Connection conn = Utils.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
 
-        try (Connection conn = Utils.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+                // PreparedStatement에 값 설정
+                pstmt.setDouble(1, latitude);
+                pstmt.setDouble(2, longitude);
+                pstmt.setInt(3, binType);
+                pstmt.setString(4, detail);
+                pstmt.setString(5, city);
 
-            // PreparedStatement에 값 설정
-            pstmt.setDouble(1, latitude);
-            pstmt.setDouble(2, longitude);
-            pstmt.setInt(3, binType);
+                // 쿼리 실행
+                int rowsAffected = pstmt.executeUpdate();
 
-            // 쿼리 실행
-            int rowsAffected = pstmt.executeUpdate();
-
-            // 데이터 추가 성공 여부 확인
-            if (rowsAffected > 0) {
-                System.out.println("Data inserted successfully.");
-                return 0; // 성공
+                // 데이터 추가 성공 여부 확인
+                if (rowsAffected > 0) {
+                    System.out.println("Data inserted successfully.");
+                    return 0; // 성공
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return -1; // 실패
+        }else{
+            return -1;
         }
-        return -1; // 실패
     }
 
     /*
@@ -170,6 +180,41 @@ public class Utils {
             e.printStackTrace();
         }
         return -1; // 실패
+    }
+
+    /*
+       name: deleteBinData
+       Param: double latitude, double longitude, int bin_type
+       desc: binList에서 Bin 삭제
+       return: 0 if success, -1 if failure
+   */
+    public static int deleteBinData(double latitude, double longitude, int bin_type, String imagePath) {
+        String deleteQuery = "DELETE FROM binList WHERE latitude = ? AND longitude = ? AND bin_type = ?";
+
+        if(Model.isBin(imagePath) == 0) {
+            try (Connection conn = Utils.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
+
+                // PreparedStatement에 값 설정
+                pstmt.setDouble(1, latitude);
+                pstmt.setDouble(2, longitude);
+                pstmt.setInt(3, bin_type);
+
+                // 쿼리 실행
+                int rowsAffected = pstmt.executeUpdate();
+
+                // 데이터 추가 성공 여부 확인
+                if (rowsAffected > 0) {
+                    System.out.println("Data Delete successfully.");
+                    return 0; // 성공
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return -1; // 실패
+        } else {
+            return -1;
+        }
     }
 
     // 스탬프 이미지 불러오기

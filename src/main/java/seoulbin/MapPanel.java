@@ -58,7 +58,7 @@ public class MapPanel extends JPanel {
     // ================ 전체 쓰레기통 위치 불러오기 + 마커 표시  =================
     public void loadTrashBinData() {
         List<Map<String, Object>> binData = Utils.allBinSelector();
-        // {"bin_id":3437,"bin_type":"1","latitude":37.48328556,"longitude":126.8789442}
+        // {"bin_id":4051,"bin_type":"0","city":"강동구","latitude":37.55174312,"detail":"주양쇼핑 따릉이 대여소(1036) 앞\r","longitude":127.1545325}
         String jsonData = new Gson().toJson(binData);
 
         browser.mainFrame().ifPresent(frame -> {
@@ -105,6 +105,13 @@ public class MapPanel extends JPanel {
         });
     }
 
+    public void getCurrentLocation() {
+        String script = String.format("getCurrentLocation()");
+        browser.mainFrame().ifPresent(frame -> {
+            frame.executeJavaScript(script);
+        });
+    }
+
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
 
@@ -115,32 +122,6 @@ public class MapPanel extends JPanel {
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
-        }
-
-        @JsAccessible
-        public void addBin(double lat, double lng) {
-            SwingUtilities.invokeLater(() -> {
-                int type = JOptionPane.showOptionDialog(
-                        null,
-                        "추가할 쓰레기통의 타입을 선택하세요:",
-                        "쓰레기통 추가",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new String[]{"일반", "재활용"},
-                        "일반"
-                );
-
-                if (type == JOptionPane.CLOSED_OPTION) return;
-
-                int result = Utils.addBinData(lat, lng, type);
-                if (result == 0) {
-                    JOptionPane.showMessageDialog(null, "쓰레기통이 성공적으로 추가되었습니다!");
-                    loadTrashBinData();
-                } else {
-                    JOptionPane.showMessageDialog(null, "쓰레기통 추가에 실패했습니다.");
-                }
-            });
         }
     }
 }

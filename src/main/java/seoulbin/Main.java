@@ -1,7 +1,7 @@
 package seoulbin;
 
 import org.json.JSONObject;
-import seoulbin.stamp.StampPage;
+import seoulbin.stamp.Stamp;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -18,9 +18,9 @@ public class Main extends JFrame {
     private JPanel mainPanel;
     private JLabel dateTimeLabel;
     private MapPanel mapPanel;
-    private StampPage stampPage;
+    private Stamp stamp;
 
-    public Main() {
+    public Main() throws IOException {
         setSize(1000, 800);
         setLayout(new BorderLayout());
 
@@ -67,6 +67,16 @@ public class Main extends JFrame {
                 mapPanel.searchPlaces(keyword);
             }
         });
+        // "현재 위치" 버튼 추가
+        JButton currentLocationButton = new JButton("현재 위치");
+        currentLocationButton.setBounds(35, 200, 200, 40);
+        currentLocationButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftPanel.add(currentLocationButton);
+
+        // 현재 위치 버튼 이벤트
+        currentLocationButton.addActionListener(e -> {
+            mapPanel.getCurrentLocation();
+        });
 
         // ================ 쓰레기통 추가 버튼  =================
         // "쓰레기통 추가" 버튼 생성
@@ -98,7 +108,7 @@ public class Main extends JFrame {
         leftPanel.add(stampPageButton);
 
         stampPageButton.addActionListener(e -> showStampPage());
-        stampPage = new StampPage(this);
+        stamp = new Stamp(this);
 
         // 윈도우 닫을 때 엔진 종료
         addWindowListener(new WindowAdapter() {
@@ -151,7 +161,7 @@ public class Main extends JFrame {
 
     public void showStampPage() {
         getContentPane().removeAll();
-        add(stampPage);
+        add(stamp);
         revalidate();
         repaint();
     }
@@ -174,7 +184,7 @@ public class Main extends JFrame {
         return "<html>" + now.format(dateFormatter) + "<br>" + now.format(timeFormatter) + "</html>";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         new Thread(() -> {
             try {
                 // 로컬 HTTP 서버 시작

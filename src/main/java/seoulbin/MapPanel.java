@@ -45,7 +45,6 @@ public class MapPanel extends JPanel {
         browser.navigation().on(LoadFinished.class, event -> {
             // 지도 초기화 (JavaScript에서 실행)
             browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("initMap();"));
-
             // 데이터 로드 및 마커 표시
             loadTrashBinData(); // Java에서 데이터 읽고 JavaScript로 전달
         });
@@ -65,8 +64,6 @@ public class MapPanel extends JPanel {
         browser.mainFrame().ifPresent(frame -> {
             frame.executeJavaScript(String.format("loadTrashBins(%s);", jsonData));
         });
-        
-        resizeMap();
     }
 
     // ================ 장소 검색  =================
@@ -84,17 +81,6 @@ public class MapPanel extends JPanel {
         engine.close();
     }
 
-    public void resizeMap() {
-        SwingUtilities.invokeLater(() -> { // 스윙 변경사항 기다리기
-            Dimension size = getSize(); // 현재 패널사이즈 가져오기
-            String script = String.format("resizeMap(%d, %d)", size.width, size.height);
-//            System.out.println(script);
-            browser.mainFrame().ifPresent(frame -> {
-                frame.executeJavaScript(script); //자바스크립트 실행
-            });
-        });
-    }
-
     // ================  쓰레기통 추가  =================
     public void enableBinAddingMode() {
     	isAddingBin=true;
@@ -108,12 +94,19 @@ public class MapPanel extends JPanel {
     }
     
 
+    //================  쓰레기통 삭제  =================
+    public void deleteBin(int bin_id) {
+        int result = utils.deleteBinData(bin_id);
+
+//        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+    }
+
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
 
         @JsAccessible // 자바스크립트에서 호출
-        public void callJavaMarkerEvent(int index, String title, double lat, double lng, int type) { // 자바스크립트 호출때 사용할 이름
-            markerEvent = new MarkerEvent(index, title, lat, lng, type);
+        public void callJavaMarkerEvent(Integer index) { // 자바스크립트 호출때 사용할 이름
+            markerEvent = new MarkerEvent(index);
 
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서

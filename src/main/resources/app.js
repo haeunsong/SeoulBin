@@ -2,6 +2,9 @@ let map;
 let places;
 let markers = [];
 let searchMarkers = [];
+let isMarkerClickEnable = true; // 마커 클릭 이벤트 활성화 여부
+let isMapClickEnabel = false; // 맵 클릭 이벤트 활성화 여부
+var clickedMarker = null; // 마커를 하나만 클릭하기 위함
 let addMarker = null;
 let infowindowAdd = null;
 
@@ -30,6 +33,8 @@ function loadTrashBins(data) {
 	// 기존 마커 초기화
 	markers.forEach(marker => marker.setMap(null));
 	markers = [];
+	// 클릭된 마커 초기화
+    clickedMarker = null;
 
 	// // 새로운 마커 추가
 	data.forEach(bin => {
@@ -43,8 +48,9 @@ function loadTrashBins(data) {
 		const imageOption = { offset: new kakao.maps.Point(18, 36) }; // 마커 중심 좌표 설정
 		const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
+
 		const markerPosition = new kakao.maps.LatLng(bin.latitude, bin.longitude);
-		const marker = new kakao.maps.Marker({
+		var marker = new kakao.maps.Marker({
 			map: map,
 			position: markerPosition,
 			title: bin.title,
@@ -55,7 +61,6 @@ function loadTrashBins(data) {
 		const infowindow = new kakao.maps.InfoWindow({
 			content: `<div style="padding:5px;">${(type === "0" ? '일반쓰레기' : '재활용쓰레기')}</div>`
 		});
-
 		// 마우스를 올렸을 때 정보창 열기
 		kakao.maps.event.addListener(marker, 'mouseover', () => {
 			infowindow.open(map, marker);
@@ -65,10 +70,37 @@ function loadTrashBins(data) {
 		kakao.maps.event.addListener(marker, 'mouseout', () => {
 			infowindow.close();
 		});
-		markers.push(marker);
-	});
+		
+        kakao.maps.event.addListener(marker, 'click', () => {
+            // 마커 클릭한 부분이 이전에 클릭한 마커라면
+            if (clickedMarker === marker) {
+                marker.setImage(new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption)); // 원래 이미지로 돌아가기
+                clickedMarker = null; // 클릭마커 초기화
+                isMarkerClickEnable = false; // 원본이미지로 바뀌면 null 보내기 (체크가 빠지면)
+            } else {
+                if (clickedMarker) { // 이전에 클릭한 마커가 있는 데, 다른 마커를 클릭한다면
+                    clickedMarker.setImage(new kakao.maps.MarkerImage(clickedMarker.type === "general" ? 'general.png': 'recycle.png',
+                         imageSize, imageOption)); // 이전에 클릭한 마커는 원본 이미지로 돌아가기
+                }
 
-	console.log("All markers added to the map.");
+                clickedMarker = marker; // 클릭한 마커를 클릭마커에 주소복사
+                marker.setImage(new kakao.maps.MarkerImage(marker.type === "general" ? 'generalCheck.png': 'recycleCheck.png',
+                     imageSize, imageOption)); // 클릭이미지로 바꾸기
+                isMarkerClickEnable = true; // 클릭이미지로 바뀌고 > 그 bin_id 보내기
+            }
+
+            if (isMarkerClickEnable===true) {
+                window.java.callJavaMarkerEvent(parseInt(bin.bin_id));
+            } else if (isMarkerClickEnable === false) {
+                window.java.callJavaMarkerEvent(null);
+            }
+        });
+
+        markers.push(marker);
+    });
+    // filter 초기화 >> 삭제 후 재 로딩할 때, 필터도 초기화 시키기 위함
+    filterMarkers('all');
+    console.log("All markers added to the map.");
 }
 
 // 3. 장소 검색
@@ -103,16 +135,16 @@ function clearMarkers() {
 
 // 마커 필터링 함수
 function filterMarkers(type) {
-	markers.forEach(marker => {
-		console.log(map);
-		if (type === 'all') {
-			marker.setMap(map); // 지도에 표시
-		} else if (marker.type === type) {
-			marker.setMap(map);
-		} else {
-			marker.setMap(null);
-		}
-	});
+    markers.forEach(marker => {
+        console.log(map);
+        if (type === 'all') {
+            marker.setMap(map); // 지도에 표시
+        } else if(marker.type === type) {
+            marker.setMap(map);
+        } else {
+            marker.setMap(null);
+        }
+    });
 
 	// 카테고리 버튼 스타일 업데이트
 	document.querySelectorAll('.category li').forEach(li => li.classList.remove('active'));
@@ -248,6 +280,7 @@ function removeBinAddingMode() {
 		alert("Java 객체를 찾을 수 없습니다.");
 	}
 }*/
+
 // ================= 맵 초기화 ========================
 document.addEventListener("DOMContentLoaded", initMap);
 

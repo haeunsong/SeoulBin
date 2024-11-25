@@ -23,7 +23,8 @@ public class MapPanel extends JPanel {
     private final Engine engine;
     private List<Map<String, Object>> binList; // 쓰레기통 리스트
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
-
+    private boolean isAddingBin = false;
+    private JsObject currentMarker = null;  // 현재 마커를 저장할 변수
     public MapPanel() {
         // 1. JxBrowser 엔진 초기화
         engine = Engine.newInstance(EngineOptions.newBuilder(HARDWARE_ACCELERATED)
@@ -96,11 +97,12 @@ public class MapPanel extends JPanel {
 
     // ================  쓰레기통 추가  =================
     public void enableBinAddingMode() {
+    	isAddingBin=true;
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
     }
     // ================ 마커 찍기 모드 비활성화 =================
     public void disableBinAddingMode() {
-    	browser.mainFrame().ifPresent(frame -> frame.executeJavaScript());
+    	browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("removeBinAddingMode()"));
     	isAddingBin = false;  // 마커 추가 모드 비활성화
         System.out.println("마커 추가 모드 종료");
     }

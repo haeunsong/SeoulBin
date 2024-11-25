@@ -3,6 +3,7 @@ let places;
 let markers = [];
 let searchMarkers = [];
 let addMarker=null;
+let infowindowAdd = null;
 // 1. 맵 초기화
 function initMap() {
     const mapContainer = document.getElementById('map');
@@ -127,61 +128,103 @@ function resizeMap(width, height) {
         div.style.height = mapHeight + 'px';
 }
 
+// 새로운 쓰레기통 마커 추가 모드 활성화
 function addNewBin() {
-    // 1. 마우스 포인터를 핀 모양으로 변경
+    if (isPinModeActive) return;  // 이미 핀 추가 모드가 활성화 되어 있으면 함수 종료
+
+    // 마우스 포인터를 핀 모양으로 변경
     document.body.style.cursor = "url('pin-pointer.png'), auto";  // 핀 포인터 이미지 경로 설정
 
-    // 2. 지도 클릭 이벤트 처리: 마커 추가 모드 활성화
-    kakao.maps.event.addListener(map, 'click', function(event) {
-        var lat = event.latLng.getLat();
-        var lng = event.latLng.getLng();
-        
-        // 3. 이전에 추가된 마커가 있으면 제거
-        if (addMarker) {
-            addMarker.setMap(null);  // 현재 마커 제거
-        }
+    // 지도 클릭 이벤트 처리: 마커 추가 모드 활성화
+    kakao.maps.event.addListener(map, 'click', onMapClick);
 
-        // 4. 새로운 마커 추가
-        addBinMarker(lat, lng);
-        
-        // 5. 마우스 포인터를 기본 상태로 변경
-        document.body.style.cursor = "default";
-        
-        // 6. 지도 클릭 이벤트 리스너 제거 (한 번 클릭 후 마커 추가 완료)
-        kakao.maps.event.removeListener(map, 'click');
-    });
+    // 핀 추가 모드 활성화
+    isPinModeActive = true;
 }
 
-// 마커를 추가하는 함수 (쓰레기통 마커 아이콘을 설정)
-function addBinMarker(lat, lng) {
-    addMarker = new kakao.maps.Marker({
-        position: new kakao.maps.LatLng(lat, lng),
-        map: map,
-        icon: {
-            url: 'pin-pointer.png',  // 쓰레기통 이미지 URL 경로
-            size: new kakao.maps.Size(30, 30),  // 마커의 크기
-            offset: new kakao.maps.Point(15, 30)  // 마커의 기준점 (중앙 아래로 설정)
+function onMapClick(event) {
+    const lat = event.latLng.getLat();
+    const lng = event.latLng.getLng();
+
+    // 카카오맵 Geocoder 인스턴스 생성
+    const geocoder = new kakao.maps.services.Geocoder();
+
+    // 위도와 경도로 주소를 가져오는 함수
+    geocoder.coord2Address(lng, lat, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+            const address = result[0].address.address_name; // 첫 번째 주소를 가져옴
+
+            // 인포윈도우 내용 설정 (주소와 추가 버튼 포함)
+            infowindowAdd = new kakao.maps.InfoWindow({
+                content: `
+                    <div style="padding:5px;">
+                        <p>${address}
+                        <button style=""type="button" onclick="addTrashBin()">추가</button>
+						</p>
+                    </div>`,
+				removable : true // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+			});
+
+            // 클릭한 위치에 마커 추가
+			if (addMarker) {
+				if(infowindowAdd.getMap()){
+					infowindowAdd.close();  // 이미 열려 있으면 닫기
+				}
+				addMarker.setMap(null);  // 이전 마커 제거
+			}
+
+            addMarker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(lat, lng),
+                map: map,
+                icon: {
+                    url: 'pin-pointer.png',  // 핀 이미지 URL
+                    size: new kakao.maps.Size(30, 30),
+                    offset: new kakao.maps.Point(15, 30)  // 마커 기준점
+                }
+            });
+
+            // 마커 위치로 지도 중심 이동
+            map.setCenter(new kakao.maps.LatLng(lat, lng));
+
+			kakao.maps.event.addListener(addMarker, 'click', function () {
+			// 인포윈도우가 이미 열려 있으면 닫기, 열려 있지 않으면 열기
+				if (infowindowAdd.getMap()) {
+					infowindowAdd.close();  // 이미 열려 있으면 닫기
+				} else {
+					infowindowAdd.open(map, addMarker);  // 열려 있지 않으면 열기
+				}
+			});
+            // 마우스 포인터를 기본 상태로 변경
+            document.body.style.cursor = "default";
+        } else {
+            console.log("주소 변환 실패");
         }
     });
 
-    // 마커가 추가된 후 지도 중심을 마커 위치로 이동
-    map.setCenter(new kakao.maps.LatLng(lat, lng));
+    // 핀 추가 모드 비활성화
+    isPinModeActive = false;
 }
 
-// 마커 찍기 모드 종료
+// 핀 찍기 모드 종료
 function removeBinAddingMode() {
     // 마우스 포인터를 기본 상태로 변경
     document.body.style.cursor = "default";
-    
+
     // 지도 클릭 이벤트 리스너 제거
-    kakao.maps.event.removeListener(map, 'click', addNewBin);
+    kakao.maps.event.removeListener(map, 'click', onMapClick);
 
     // 추가된 마커를 숨길 수 있다면, 추가한 마커를 제거하는 로직을 추가할 수 있음
-    if (addMarker) {
-        addMarker.setMap(null);
-    }
+	if (addMarker) {
+		if (infowindowAdd.getMap()) {
+			infowindowAdd.close(); // 이전 인포윈도우 닫기
+		}
+		addMarker.setMap(null);  // 이전 마커 제거
+		}
+
+    // 핀 추가 모드 비활성화
+    isPinModeActive = false;
 }
-		
+
 // ================= 맵 초기화 ========================
 document.addEventListener("DOMContentLoaded", initMap);
 

@@ -84,12 +84,13 @@ public class Main extends JFrame {
         
         // "쓰레기통 추가" 버튼 이벤트
         addBinButton.addActionListener(e -> {
-        	int option=JOptionPane.showConfirmDialog(Main.this, "원하는 위치에 핀을 꽂아주세요.","쓰레기통 추가",JOptionPane.YES_NO_OPTION);;
+        	int option=JOptionPane.showConfirmDialog(Main.this, "원하는 위치에 마커를 꽂아주세요.","쓰레기통 추가",JOptionPane.YES_NO_OPTION);;
         	
         	if(option == JOptionPane.YES_OPTION) {
         		mapPanel.enableBinAddingMode();
         		endPinButton.setVisible(true);  // 핀 찍기 종료 버튼 보이기
         	}
+        });
         // "핀 찍기 종료" 버튼 클릭 시 이벤트
         endPinButton.addActionListener(e -> {
             mapPanel.disableBinAddingMode();  // 마커 찍기 모드 비활성화
@@ -109,6 +110,9 @@ public class Main extends JFrame {
 
         // 오른쪽 패널에 mapPanel 추가
         rightPanel.add(mapPanel, BorderLayout.CENTER);
+        
+        // 오른쪽 패널에 mapPanel 추가
+        rightPanel.add(endPinButton, BorderLayout.NORTH);
 
         // "스탬프 페이지 이동" 버튼 생성
         JButton stampPageButton = new JButton("스탬프 페이지");

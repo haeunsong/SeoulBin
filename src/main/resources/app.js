@@ -131,7 +131,8 @@ function loadTrashBins(data) {
             }
 
             if (isMarkerClickEnable===true) {
-                window.java.callJavaMarkerEvent(parseInt(bin.bin_id));
+                //window.java.callJavaMarkerEvent(parseInt(bin.bin_id));
+				window.java.callJavaMarkerEvent(parseInt(bin.bin_id), parseFloat(bin.latitude), parseFloat(bin.longitude), parseInt(bin.bin_type));
             } else if (isMarkerClickEnable === false) {
                 window.java.callJavaMarkerEvent(null);
             }
@@ -193,6 +194,14 @@ function filterMarkers(type) {
     document.querySelectorAll('.category li').forEach(li => li.classList.remove('active'));
     document.getElementById(type === 'all' ? 'all' : type === 'general' ? 'general' : 'recycle').classList.add('active');
 }
+
+// 마커 체크마커 이미지 원래대로 돌리기
+function resetMarkerImage() {
+    clickedMarker.setImage(new kakao.maps.MarkerImage(clickedMarker.type === "general" ? 'general.png': 'recycle.png',
+         new kakao.maps.Size(36, 36), { offset: new kakao.maps.Point(18, 36) }));
+    clickedMarker = null;
+}
+
 		
 // ================= 맵 초기화 ========================
 document.addEventListener("DOMContentLoaded", initMap);

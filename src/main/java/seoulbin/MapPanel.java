@@ -21,7 +21,6 @@ import java.util.Map;
 public class MapPanel extends JPanel {
     private final Browser browser;
     private final Engine engine;
-    private List<Map<String, Object>> binList; // 쓰레기통 리스트
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
 
     public MapPanel() {
@@ -63,8 +62,6 @@ public class MapPanel extends JPanel {
         browser.mainFrame().ifPresent(frame -> {
             frame.executeJavaScript(String.format("loadTrashBins(%s);", jsonData));
         });
-
-        resizeMap();
     }
 
     // ================ 장소 검색  =================
@@ -86,6 +83,20 @@ public class MapPanel extends JPanel {
     public void enableBinAddingMode() {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
     }
+    
+    // ================ 쓰레기통 삭제 ================
+    public void deleteBin(int markerIndex) {
+        int result = Utils.deleteBinData(markerIndex);
+
+        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+    }
+    
+    //================  쓰레기통 삭제  =================
+    public void deleteBin(MarkerEvent marker, String imagePath) {
+        int result = Utils.deleteBinData(marker.lat, marker.lng, marker.type, imagePath);
+
+        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+    }
 
 
     public void setCenter(double lat, double lng) {
@@ -101,17 +112,33 @@ public class MapPanel extends JPanel {
             frame.executeJavaScript(script);
         });
     }
+    
+  //================== 쓰레기통 마커 초기화(클릭해체)-------
+    public void resetMarkerImage() {
+        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("resetMarkerImage()"));
+    }
 
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
 
         @JsAccessible // 자바스크립트에서 호출
-        public void callJavaMarkerEvent(Integer index) { // 자바스크립트 호출때 사용할 이름
-            markerEvent = new MarkerEvent(index);
+        public void callJavaMarkerEvent(Integer index, Double lat, Double lng, Integer type) { // 자바스크립트 호출때 사용할 이름
+            markerEvent = new MarkerEvent(index, lat, lng, type);
+
+            if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
+                markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
+            }
+        }
+        
+        @JsAccessible // 자바스크립트에서 호출
+        public void callJavaMarkerEvent(Object nullCheck) { // null 받기
+            markerEvent = (MarkerEvent) nullCheck;
 
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
         }
     }
+    
+    
 }

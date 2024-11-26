@@ -1,7 +1,8 @@
 package seoulbin;
 
 import org.json.JSONObject;
-import seoulbin.stamp.StampPage;
+import seoulbin.stamp.Stamp;
+import seoulbin.review.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -18,10 +19,12 @@ public class Main extends JFrame {
     private JPanel mainPanel;
     private JLabel dateTimeLabel;
     private MapPanel mapPanel;
-    private StampPage stampPage;
-    private Integer markerIndex; // 삭제를 위한 마커 인덱스
-
-    public Main() {
+    private Stamp stamp;
+//    private Integer markerIndex; // 삭제를 위한 마커 인덱스
+    private MarkerEvent marker;
+    private ReviewButton reviewButton;
+    
+    public Main() throws IOException {
         setSize(1000, 800);
         setLayout(new BorderLayout());
 
@@ -68,6 +71,33 @@ public class Main extends JFrame {
                 mapPanel.searchPlaces(keyword);
             }
         });
+        // "현재 위치" 버튼 추가
+        JButton currentLocationButton = new JButton("현재 위치");
+        currentLocationButton.setBounds(35, 200, 200, 40);
+        currentLocationButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftPanel.add(currentLocationButton);
+
+        // 현재 위치 버튼 이벤트
+        currentLocationButton.addActionListener(e -> {
+            mapPanel.getCurrentLocation();
+        });
+        
+        // ================ 쓰레기통 리뷰 버튼  =================
+        reviewButton = new ReviewButton();
+        reviewButton.setBounds(35, 420, 200, 40); // 검색 버튼 아래에 위치
+        reviewButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
+        leftPanel.add(reviewButton);
+        // "쓰레기통 리뷰" 버튼 이벤트
+        reviewButton.addActionListener(e -> {
+            if (marker != null) {
+                new ReviewDialog(this, reviewButton, marker.index);
+                marker = null;
+                mapPanel.resetMarkerImage();
+            } else {
+                JOptionPane.showMessageDialog(this, "마커를 클릭하세요.",
+                        "Message", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
         // ================ 쓰레기통 추가 버튼  =================
         // "쓰레기통 추가" 버튼 생성
@@ -107,14 +137,18 @@ public class Main extends JFrame {
 
         // 쓰레기통 삭제 버튼 이벤트
         deleteBinButton.addActionListener(e -> {
-            if (markerIndex != null) {
+            if (marker != null) {
                 int result = JOptionPane.showConfirmDialog(this,
                         "정말 삭제하시겠습니까?", "Mesaage", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     // 삭제하는 부분
-//                    System.out.println(markerIndex + "삭제");
-                    mapPanel.deleteBin(markerIndex);
-                    markerIndex = null;
+//                    System.out.println(marker.lat + ", " + marker.lng + "삭제" + marker.type);
+//                    mapPanel.deleteBin(marker, "src/main/resources/static/333.jpg");
+                	mapPanel.deleteBin(marker.index);
+                    marker = null;
+                    
+                    // 리뷰 버튼도 초기화
+                    reviewButton.resetReview();
                     // 쓰레기통 로딩 다시
                     mapPanel.loadTrashBinData();
                 }
@@ -141,7 +175,7 @@ public class Main extends JFrame {
         leftPanel.add(stampPageButton);
 
         stampPageButton.addActionListener(e -> showStampPage());
-        stampPage = new StampPage(this);
+        stamp = new Stamp(this);
 
         // 윈도우 닫을 때 엔진 종료
         addWindowListener(new WindowAdapter() {
@@ -155,8 +189,14 @@ public class Main extends JFrame {
         mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
             @Override
             public void markerClicked(MarkerEvent e) { // MarkerEvent.index
-                System.out.println("이벤트 테스트용 : "+ e.index);
-                markerIndex = e.index;
+//                System.out.println("이벤트 테스트용 : "+ e.index);
+//                markerIndex = e.index;
+                marker = e;
+                if (e != null) {
+                    reviewButton.loadReview(e.index);
+                } else {
+                    reviewButton.resetReview();
+                }
             }
         });
 
@@ -181,7 +221,7 @@ public class Main extends JFrame {
 
     public void showStampPage() {
         getContentPane().removeAll();
-        add(stampPage);
+        add(stamp);
         revalidate();
         repaint();
     }
@@ -204,7 +244,7 @@ public class Main extends JFrame {
         return "<html>" + now.format(dateFormatter) + "<br>" + now.format(timeFormatter) + "</html>";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         new Thread(() -> {
             try {
                 // 로컬 HTTP 서버 시작

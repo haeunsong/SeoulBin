@@ -11,7 +11,7 @@ import com.teamdev.jxbrowser.js.JsAccessible;
 import com.teamdev.jxbrowser.js.JsObject;
 import com.teamdev.jxbrowser.navigation.event.*;
 import com.teamdev.jxbrowser.view.swing.BrowserView;
-import mapdata.utils;
+import mapdata.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,8 +57,8 @@ public class MapPanel extends JPanel {
     }
     // ================ 전체 쓰레기통 위치 불러오기 + 마커 표시  =================
     public void loadTrashBinData() {
-        List<Map<String, Object>> binData = utils.allBinSelector();
-        // {"bin_id":3437,"bin_type":"1","latitude":37.48328556,"longitude":126.8789442}
+        List<Map<String, Object>> binData = Utils.allBinSelector();
+        // {"bin_id":4051,"bin_type":"0","city":"강동구","latitude":37.55174312,"detail":"주양쇼핑 따릉이 대여소(1036) 앞\r","longitude":127.1545325}
         String jsonData = new Gson().toJson(binData);
 
         browser.mainFrame().ifPresent(frame -> {
@@ -92,55 +92,63 @@ public class MapPanel extends JPanel {
     	isAddingBin = false;  // 마커 추가 모드 비활성화
         System.out.println("마커 추가 모드 종료");
     }
-    
+
+
+    // ================ 쓰레기통 삭제 ================
+    public void deleteBin(int markerIndex) {
+        int result = Utils.deleteBinData(markerIndex);
+
+        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+    }
 
     //================  쓰레기통 삭제  =================
-    public void deleteBin(int bin_id) {
-        int result = utils.deleteBinData(bin_id);
+    public void deleteBin(MarkerEvent marker, String imagePath) {
+        int result = Utils.deleteBinData(marker.lat, marker.lng, marker.type, imagePath);
 
-//        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+    }
+
+
+    public void setCenter(double lat, double lng) {
+        String script = String.format("setCenter(%f, %f)", lat, lng);
+        browser.mainFrame().ifPresent(frame -> {
+            frame.executeJavaScript(script); //자바스크립트 실행
+        });
+    }
+
+    public void getCurrentLocation() {
+        String script = String.format("getCurrentLocation()");
+        browser.mainFrame().ifPresent(frame -> {
+            frame.executeJavaScript(script);
+        });
+    }
+
+  //================== 쓰레기통 마커 초기화(클릭해체)-------
+    public void resetMarkerImage() {
+        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("resetMarkerImage()"));
     }
 
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
 
         @JsAccessible // 자바스크립트에서 호출
-        public void callJavaMarkerEvent(Integer index) { // 자바스크립트 호출때 사용할 이름
-            markerEvent = new MarkerEvent(index);
+        public void callJavaMarkerEvent(Integer index, Double lat, Double lng, Integer type) { // 자바스크립트 호출때 사용할 이름
+            markerEvent = new MarkerEvent(index, lat, lng, type);
 
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
         }
 
-       /* @JsAccessible
-        public void addBin(double lat, double lng) {
-            SwingUtilities.invokeLater(() -> {
-                int type = JOptionPane.showOptionDialog(
-                        null,
-                        "추가할 쓰레기통의 타입을 선택하세요:",
-                        "쓰레기통 추가",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new String[]{"일반", "재활용"},
-                        "일반"
-                );
-
-                if (type == JOptionPane.CLOSED_OPTION) return;
-
-                int result = utils.addBinData(lat, lng, type);
-                if (result == 0) {
-                    JOptionPane.showMessageDialog(null, "쓰레기통이 성공적으로 추가되었습니다!");
-                    loadTrashBinData();
-                } else {
-                    JOptionPane.showMessageDialog(null, "쓰레기통 추가에 실패했습니다.");
-                }
-            });*/
         @JsAccessible // 자바스크립트에서 호출
-        public void showAddBinDialog(double lat, double lng,String address) {
-            // 기존 AddBtnAction을 호출하는 코드
-            new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
+        public void callJavaMarkerEvent(Object nullCheck) { // null 받기
+            markerEvent = (MarkerEvent) nullCheck;
+
+            if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
+                markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
+            }
         }
     }
+
+
 }

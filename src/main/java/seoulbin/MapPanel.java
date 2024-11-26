@@ -25,6 +25,7 @@ public class MapPanel extends JPanel {
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
     private boolean isAddingBin = false;
     private JsObject currentMarker = null;  // 현재 마커를 저장할 변수
+    private Object downAddFrame;
     public MapPanel() {
         // 1. JxBrowser 엔진 초기화
         engine = Engine.newInstance(EngineOptions.newBuilder(HARDWARE_ACCELERATED)
@@ -92,7 +93,15 @@ public class MapPanel extends JPanel {
     	isAddingBin = false;  // 마커 추가 모드 비활성화
         System.out.println("마커 추가 모드 종료");
     }
-
+    // ================창이 내려갔는지 확인하는 메소드=============
+    public void handleAddBtnActionClosure(Object result) {
+        // 예시로, 쓰레기통 추가 완료 메시지를 표시
+    	System.out.println("쓰레기통 추가완료");
+    	downAddFrame=result;
+    }
+    public Object getDownAddFrame() {
+    	return downAddFrame;
+    }
 
     // ================ 쓰레기통 삭제 ================
     public void deleteBin(int markerIndex) {
@@ -147,6 +156,21 @@ public class MapPanel extends JPanel {
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
+        }
+        
+//        @JsAccessible // 자바스크립트에서 호출 어떻게 써야할지 모르겠습니다...
+//        public void callJavaMarkerEvent(Double lat, Double lng, String address) {
+//        	markerEvent=new MarkerEvent(lat, lng, address);
+//        	
+//        	if(markerClickEventListener!=null) {
+//        		markerClickEventListener.markerClicked(lat,lng,address);
+//        	}
+//        }
+        
+        @JsAccessible // 자바스크립트에서 호출
+        public void showAddBinDialog(double lat, double lng,String address) {
+            // 기존 AddBtnAction을 호출하는 코드
+            new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
     }
 

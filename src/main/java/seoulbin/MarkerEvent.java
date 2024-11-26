@@ -11,6 +11,7 @@ public class MarkerEvent {
     public double lat;
     public double lng;
     public int type;
+    public String address;
 
     public MarkerEvent(Integer index) {
         this.index = index;
@@ -25,5 +26,11 @@ public class MarkerEvent {
         this.lat = lat;
         this.lng = lng;
         this.type = type;
+    }
+    
+    public MarkerEvent(double lat, double lng, String address) {
+    	this.lat=lat;
+    	this.lng=lng;
+    	this.address=address;
     }
 }

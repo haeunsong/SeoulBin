@@ -21,8 +21,11 @@ import java.util.Map;
 public class MapPanel extends JPanel {
     private final Browser browser;
     private final Engine engine;
+    private List<Map<String, Object>> binList; // 쓰레기통 리스트
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
-
+    private boolean isAddingBin = false;
+    private JsObject currentMarker = null;  // 현재 마커를 저장할 변수
+    private Object downAddFrame;
     public MapPanel() {
         // 1. JxBrowser 엔진 초기화
         engine = Engine.newInstance(EngineOptions.newBuilder(HARDWARE_ACCELERATED)
@@ -81,16 +84,32 @@ public class MapPanel extends JPanel {
 
     // ================  쓰레기통 추가  =================
     public void enableBinAddingMode() {
+    	isAddingBin=true;
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
     }
-    
+    // ================ 마커 찍기 모드 비활성화 =================
+    public void disableBinAddingMode() {
+    	browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("removeBinAddingMode()"));
+    	isAddingBin = false;  // 마커 추가 모드 비활성화
+        System.out.println("마커 추가 모드 종료");
+    }
+    // ================창이 내려갔는지 확인하는 메소드=============
+    public void handleAddBtnActionClosure(Object result) {
+        // 예시로, 쓰레기통 추가 완료 메시지를 표시
+    	System.out.println("쓰레기통 추가완료");
+    	downAddFrame=result;
+    }
+    public Object getDownAddFrame() {
+    	return downAddFrame;
+    }
+
     // ================ 쓰레기통 삭제 ================
     public void deleteBin(int markerIndex) {
         int result = Utils.deleteBinData(markerIndex);
 
         System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
     }
-    
+
     //================  쓰레기통 삭제  =================
     public void deleteBin(MarkerEvent marker, String imagePath) {
         int result = Utils.deleteBinData(marker.lat, marker.lng, marker.type, imagePath);
@@ -112,7 +131,7 @@ public class MapPanel extends JPanel {
             frame.executeJavaScript(script);
         });
     }
-    
+
   //================== 쓰레기통 마커 초기화(클릭해체)-------
     public void resetMarkerImage() {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("resetMarkerImage()"));
@@ -129,7 +148,7 @@ public class MapPanel extends JPanel {
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
         }
-        
+
         @JsAccessible // 자바스크립트에서 호출
         public void callJavaMarkerEvent(Object nullCheck) { // null 받기
             markerEvent = (MarkerEvent) nullCheck;
@@ -137,6 +156,21 @@ public class MapPanel extends JPanel {
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
+        }
+
+//        @JsAccessible // 자바스크립트에서 호출 어떻게 써야할지 모르겠습니다...
+//        public void callJavaMarkerEvent(Double lat, Double lng, String address) {
+//        	markerEvent=new MarkerEvent(lat, lng, address);
+//
+//        	if(markerClickEventListener!=null) {
+//        		markerClickEventListener.markerClicked(lat,lng,address);
+//        	}
+//        }
+
+        @JsAccessible // 자바스크립트에서 호출
+        public void showAddBinDialog(double lat, double lng,String address) {
+            // 기존 AddBtnAction을 호출하는 코드
+            new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
 
         @JsAccessible

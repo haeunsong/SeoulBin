@@ -1,5 +1,5 @@
 package mapdata;
-
+// test
 import model.Model;
 
 import javax.swing.*;
@@ -216,6 +216,30 @@ public class Utils {
             return -1;
         }
     }
+public static int deleteBinData(int bin_id) {
+        String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
+        String deleteQuery = "DELETE FROM binList WHERE bin_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
+
+            // PreparedStatement에 값 설정
+            pstmt.setInt(1, bin_id);
+
+            // 쿼리 실행
+            int rowsAffected = pstmt.executeUpdate();
+
+            // 데이터 추가 성공 여부 확인
+            if (rowsAffected > 0) {
+                System.out.println("Data Delete successfully.");
+                return 0; // 성공
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // 실패
+    }
+    
 
     // 스탬프 이미지 불러오기
     public static String getImagePath(int imageId) {

@@ -138,6 +138,11 @@ public class MapPanel extends JPanel {
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
         }
+
+        @JsAccessible
+        public double callJavaGetReview(int bin_id) {
+            return Utils.selectBinReview(bin_id);
+        }
     }
     
     

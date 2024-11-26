@@ -140,7 +140,7 @@ public class Utils {
                 // 결과가 있으면 평균 review 값을 가져옴
                 if (rs.next()) {
                     double avgReview = rs.getDouble("avg_review");
-                    System.out.println("Average review: " + avgReview);
+                   // System.out.println("Average review: " + avgReview);
                     return avgReview; // 평균값 반환
                 }
             }

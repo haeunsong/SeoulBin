@@ -89,7 +89,22 @@ function loadTrashBins(data) {
         marker.type = type === "0" ? "general" : "recycle";
 
         const infowindow = new kakao.maps.InfoWindow({
-            content: `
+            content: '' // 초기 내용은 비워둠
+        });
+
+        // 마커 이벤트 등록
+        kakao.maps.event.addListener(marker, 'mouseover', () => {
+            let review;
+            try {
+                // 동적으로 리뷰 가져오기
+                review = window.java.callJavaGetReview(bin.bin_id);
+            } catch (error) {
+                console.error("Failed to fetch review:", error);
+                review = 0; // 기본 리뷰 값
+            }
+
+            // infoWindow 내용 업데이트
+            infowindow.setContent(`
         <div style="padding:5px; width:180px; font-family:Arial, sans-serif;">
             <div style="font-size:13px; color:gray; margin-bottom:5px;">
                 ${type === "0" ? '일반쓰레기' : '재활용쓰레기'}
@@ -97,17 +112,14 @@ function loadTrashBins(data) {
             <div style="font-size:17px; color:black;">
                 ${bin.detail}
             </div>
+            <div style="font-size:17px; color:black;">
+                ${'리뷰 : ' + generateStarRating(review)}
+            </div>
         </div>
-    `
-        });
-
-
-        // 마우스를 올렸을 때 정보창 열기
-        kakao.maps.event.addListener(marker, 'mouseover', () => {
+    `);
             infowindow.open(map, marker);
         });
 
-        // 마우스를 뗐을 때 정보창 닫기
         kakao.maps.event.addListener(marker, 'mouseout', () => {
             infowindow.close();
         });
@@ -146,6 +158,20 @@ function loadTrashBins(data) {
     console.log("All markers added to the map.");
 }
 
+// 리뷰 별표를 생성하는 함수
+function generateStarRating(review) {
+    // 리뷰 점수를 반올림
+    const roundedReview = Math.round(review);
+
+    // 별표 생성
+    let stars = '';
+    for (let i = 0; i < 5; i++) {
+        stars += i < roundedReview ? '★' : '☆';
+    }
+
+    return stars; // 예: ★★★☆☆
+}
+
 // 3. 장소 검색
 function searchPlaces(keyword) {
 
@@ -180,7 +206,6 @@ function clearMarkers() {
 // 마커 필터링 함수
 function filterMarkers(type) {
     markers.forEach(marker => {
-        console.log(map);
         if (type === 'all') {
             marker.setMap(map); // 지도에 표시
         } else if (marker.type === type) {
@@ -202,7 +227,7 @@ function resetMarkerImage() {
     clickedMarker = null;
 }
 
-		
+
 // ================= 맵 초기화 ========================
 document.addEventListener("DOMContentLoaded", initMap);
 

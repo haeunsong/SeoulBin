@@ -1,6 +1,6 @@
 **dependency  추가**
 ** utils 순회 코드 (참고 자료) 추가**
-
+vm option or vm argument에 '''--add-opens java.desktop/java.awt=ALL-UNNAMED''' 추가
 
 ```
 <repositories>

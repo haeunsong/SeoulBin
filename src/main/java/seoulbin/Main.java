@@ -19,6 +19,7 @@ public class Main extends JFrame {
     private JLabel dateTimeLabel;
     private MapPanel mapPanel;
     private Stamp stamp;
+    private Integer markerIndex; // 삭제를 위한 마커 인덱스
 
     public Main() throws IOException {
         setSize(1000, 800);
@@ -94,6 +95,25 @@ public class Main extends JFrame {
         deleteBinButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(deleteBinButton);
 
+        // 쓰레기통 삭제 버튼 이벤트
+        deleteBinButton.addActionListener(e -> {
+            if (markerIndex != null) {
+                int result = JOptionPane.showConfirmDialog(this,
+                        "정말 삭제하시겠습니까?", "Mesaage", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    // 삭제하는 부분
+//                    System.out.println(markerIndex + "삭제");
+                    mapPanel.deleteBin(markerIndex);
+                    markerIndex = null;
+                    // 쓰레기통 로딩 다시
+                    mapPanel.loadTrashBinData();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "마커를 클릭하세요.",
+                        "Message", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         // 오른쪽 패널 설정 (지도 표시 영역)
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setPreferredSize(new Dimension(730, 800));
@@ -121,24 +141,11 @@ public class Main extends JFrame {
         // 마커 클릭 예시
         mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
             @Override
-            public void markerClicked(MarkerEvent e) { // MarkerEvent는 title, lat, lng, index, type정보를 갖고 있음
-                System.out.println("이벤트 테스트용 : "+ e.title);
+            public void markerClicked(MarkerEvent e) { // MarkerEvent.index
+                System.out.println("이벤트 테스트용 : "+ e.index);
+                markerIndex = e.index;
             }
         });
-//
-//        JButton testButton = new JButton("이거 누르면 마커 하나 더 생김" );
-//        add(testButton, BorderLayout.NORTH);
-//
-//        // resize와 addMarker가 작동하는지 테스트
-//        testButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-////                setSize(500, 500);
-//                mapPanel.resizeMap();
-//                System.out.println(mapPanel.getSize().width);
-//                mapPanel.addMarker("shku2", 37.4896, 126.8399, 0);
-//            };
-//        });
 
         // 프레임에 패널 추가
         add(leftPanel, BorderLayout.WEST);

@@ -216,7 +216,7 @@ public class Utils {
             return -1;
         }
     }
-public static int deleteBinData(int bin_id) {
+    public static int deleteBinData(int bin_id) {
         String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
         String deleteQuery = "DELETE FROM binList WHERE bin_id = ?";
 

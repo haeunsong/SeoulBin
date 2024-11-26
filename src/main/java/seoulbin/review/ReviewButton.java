@@ -30,4 +30,6 @@ public class ReviewButton extends JButton {
     public void resetReview() {
         setText("☆☆☆☆☆");
     }
+
+    public int getReview() { return review; }
 }

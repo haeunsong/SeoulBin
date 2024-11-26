@@ -22,6 +22,7 @@ public class MapPanel extends JPanel {
     private final Browser browser;
     private final Engine engine;
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
+    private MapClickEventListener mapClickEventListener;
 
     public MapPanel() {
         // 1. JxBrowser 엔진 초기화
@@ -73,6 +74,23 @@ public class MapPanel extends JPanel {
     // 마커 클릭 이벤트 인터페이스 구현
     public void addMarkerClickEventListener(MarkerClickEventListener markerClickEventListener) {
         this.markerClickEventListener = markerClickEventListener;
+    }
+
+    // 맵 클릭 이벤트 인터페이스 구현
+    public void addMapClickEventListener(MapClickEventListener mapClickEventListener) {
+        this.mapClickEventListener = mapClickEventListener;
+    }
+
+    /**
+     * 맵 클릭 여부 변경
+     * false로 변경시 맵에 찍힌 마커도 삭제됨
+     * @param true_or_false
+     */
+    public void setMapClickEnable(boolean true_or_false) {
+        String script = String.format("setMapClickEnable(%b)", true_or_false);
+        browser.mainFrame().ifPresent(frame -> {
+            frame.executeJavaScript(script); //자바스크립트 실행
+        });
     }
 
     public void engineClose() {
@@ -136,6 +154,13 @@ public class MapPanel extends JPanel {
 
             if (markerClickEventListener != null) { // 마커클릭이벤트가 등록되면
                 markerClickEventListener.markerClicked(markerEvent); // 마커 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
+            }
+        }
+
+        @JsAccessible // 자바스크립트에서 호출 맵클릭
+        public void callJavaMapEvent(double lat, double lng) { // null 받기
+            if (mapClickEventListener != null) { // 맵클릭이벤트가 등록되면
+                mapClickEventListener.mapClicked(lat, lng); // 맵 클릭 이벤트 전달 < 마커 클릭 이벤트 실행 여기서
             }
         }
     }

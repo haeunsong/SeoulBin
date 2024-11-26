@@ -20,7 +20,6 @@ public class Main extends JFrame {
     private JLabel dateTimeLabel;
     private MapPanel mapPanel;
     private Stamp stamp;
-//    private Integer markerIndex; // 삭제를 위한 마커 인덱스
     private MarkerEvent marker;
     private ReviewButton reviewButton;
     
@@ -174,6 +173,14 @@ public class Main extends JFrame {
                 } else {
                     reviewButton.resetReview();
                 }
+            }
+        });
+
+        // 맵 클릭 이벤트 리스너
+        mapPanel.addMapClickEventListener(new MapClickEventListener() {
+            @Override
+            public void mapClicked(double lat, double lng) { // MarkerEvent.index
+                System.out.println(lat + ", " + lng);
             }
         });
 

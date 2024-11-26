@@ -1,5 +1,4 @@
 package mapdata;
-// test
 import model.Model;
 
 import javax.swing.*;

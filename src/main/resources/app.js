@@ -3,7 +3,8 @@ let places;
 let markers = [];
 let searchMarkers = [];
 let isMarkerClickEnable = true; // 마커 클릭 이벤트 활성화 여부
-let isMapClickEnabel = false; // 맵 클릭 이벤트 활성화 여부
+let isMapClickEnable = false; // 맵 클릭 이벤트 활성화 여부
+var mapMarker;
 var clickedMarker = null; // 마커를 하나만 클릭하기 위함
 
 // 1. 맵 초기화
@@ -15,8 +16,27 @@ function initMap() {
     };
     map = new kakao.maps.Map(mapContainer, mapOptions);
     map.setLevel(5);
-    places = new kakao.maps.services.Places(map);
 
+    // ==========맵 클릭 이벤트때 표시할 마커=======
+    mapMarker = new kakao.maps.Marker({
+        // 지도 중심좌표에 마커를 생성합니다 일단 안 보임
+        position: map.getCenter()
+    });
+
+    kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+        if (isMapClickEnable === true) {
+            // 클릭한 위도, 경도 정보를 가져옵니다
+            var latlng = mouseEvent.latLng;
+            // 마커 위치를 클릭한 위치로 옮깁니다
+            mapMarker.setPosition(latlng);
+            mapMarker.setMap(map);
+            let mapLat = parseFloat(latlng.getLat().toFixed(8));
+            let mapLng = parseFloat(latlng.getLng().toFixed(8));
+            window.java.callJavaMapEvent(mapLat, mapLng);
+        }
+    });
+
+    places = new kakao.maps.services.Places(map);
     console.log("intiMap() 호출됨");
 }
 
@@ -202,7 +222,15 @@ function resetMarkerImage() {
     clickedMarker = null;
 }
 
-		
+// 맵 클릭 여부 변경
+function setMapClickEnable(true_or_false) {
+    isMapClickEnable = true_or_false;
+
+    if (isMapClickEnable === false) {
+        mapMarker.setMap(null);
+    }
+}
+
 // ================= 맵 초기화 ========================
 document.addEventListener("DOMContentLoaded", initMap);
 

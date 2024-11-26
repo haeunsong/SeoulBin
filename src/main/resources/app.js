@@ -7,6 +7,7 @@ let isMapClickEnabel = false; // 맵 클릭 이벤트 활성화 여부
 var clickedMarker = null; // 마커를 하나만 클릭하기 위함
 let addMarker = null;
 let infowindowAdd = null;
+let isPinModeActive = false;
 
 // 1. 맵 초기화
 function initMap() {

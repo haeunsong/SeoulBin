@@ -47,8 +47,15 @@ public class ReviewDialog extends JDialog {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                Utils.addBinReview(bin_index, index + 1); //1부터 시작이라서 (1추가) // 별 인덱스는 0
-//                reviewButton.loadReview(bin_index);
+
+                // 리뷰가 있다면 리뷰를 업데이트하는 방식
+                boolean hasReview = Utils.hasExistingReview(bin_index);
+                if(hasReview) {
+                   Utils.updateBinReview(bin_index, index+1);
+                }else {
+                    // 리뷰 새로 추가
+                    Utils.addBinReview(bin_index, index + 1); //1부터 시작이라서 (1추가) // 별 인덱스는 0
+                }
                 reviewButton.resetReview();
                 dispose();
             }

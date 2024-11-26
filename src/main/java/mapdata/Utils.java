@@ -182,6 +182,49 @@ public class Utils {
         return -1; // 실패
     }
 
+    // 리뷰 업데이트
+    public static int updateBinReview(int bin_id, int review) {
+        String updateQuery = "UPDATE binreview SET review = ? WHERE bin_id = ?";
+
+        try (Connection conn = Utils.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+
+            // PreparedStatement에 값 설정
+            pstmt.setInt(1, review);
+            pstmt.setInt(2, bin_id);
+
+            // 쿼리 실행
+            int rowsAffected = pstmt.executeUpdate();
+
+            // 데이터 업데이트 성공 여부 확인
+            if (rowsAffected > 0) {
+                System.out.println("Data updated successfully.");
+                return 0; // 성공
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // 실패
+    }
+
+    // 리뷰 있는지 조회
+    public static boolean hasExistingReview(int bin_id) {
+        String selectQuery = "SELECT COUNT(*) FROM binreview WHERE bin_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(selectQuery)) {
+
+            pstmt.setInt(1, bin_id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // 리뷰가 존재하면 true 반환
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // 리뷰가 없거나 오류 발생 시 false
+    }
+
+
     /*
        name: deleteBinData
        Param: double latitude, double longitude, int bin_type

@@ -243,7 +243,7 @@ function addHome() {
     // 커서 모양 핀 포인터로 바꾸고
     document.body.style.cursor = "url('pin-pointer.png'), auto";
     // map 클릭 이벤트 처리
-    kakao.maps.event.addListener(map, 'click', (event) => onMapClick(event, "addHome"));
+    kakao.maps.event.addListener(map, 'click',onMapClickHome);
     // HOME 추가 모드 활성화
     isHomeModeActive = true;
 
@@ -290,16 +290,84 @@ function addHomeIcon(lat, lng, address) {
     kakao.maps.event.addListener(homeMarker, 'mouseout', () => {
         infowindowHome.close();
     });
-
+    map.setCenter(new kakao.maps.LatLng(lat, lng));
     console.log(`Home 아이콘이 추가되었습니다: ${lat}, ${lng}`);
+
 }
 
-function onMapClick(event, mode) {
+function onMapClickHome(event) {
+    const lat = event.latLng.getLat();
+    const lng = event.latLng.getLng();
+
+    if (!isHomeModeActive) return;
+
+    // 카카오맵 Geocoder 인스턴스 생성
+    const geocoder = new kakao.maps.services.Geocoder();
+
+    // 위도와 경도로 주소를 가져오는 함수
+    geocoder.coord2Address(lng, lat, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+            address = result[0].address.address_name; // 첫 번째 주소를 가져옴
+
+            // 인포윈도우 내용 설정 (주소와 추가 버튼 포함)
+            infowindowHome = new kakao.maps.InfoWindow({
+                content: `
+                    <div style="padding:5px;">
+                        <p>주소:${address}</p>
+                    </div>`,
+            });
+            // 이전 마커 제거
+            if (homeMarker) {
+                homeMarker.setMap(null);
+                if (infowindowHome) infowindowHome.close(); // 인포윈도우 닫기
+            }
+
+            homeMarker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(lat, lng),
+                map: map,
+                icon: {
+                    url: 'pin-pointer.png',  // 핀 이미지 URL
+                    size: new kakao.maps.Size(30, 30),
+                    offset: new kakao.maps.Point(15, 30)  // 마커 기준점
+                }
+            });
+
+            // 마커 위치로 지도 중심 이동
+            map.setCenter(new kakao.maps.LatLng(lat, lng));
+
+
+            // 마우스를 올렸을 때 정보창 열기
+            kakao.maps.event.addListener(homeMarker, 'mouseover', () => {
+                infowindowHome.open(map, homeMarker);
+            });
+
+            // 마우스를 뗐을 때 정보창 닫기
+            kakao.maps.event.addListener(homeMarker, 'mouseout', () => {
+                infowindowHome.close();
+            });
+
+            kakao.maps.event.addListener(homeMarker, 'click', () => {
+                window.java.showAddHomeDialog(lat, lng, address);  // Java 메서드 호출
+                homeMarker.setMap(null); // 마커 제거
+                removeClickListener();
+                isHomeModeActive = false;
+                document.body.style.cursor = "default";
+                if (infowindowHome) infowindowHome.close(); // 인포윈도우 닫기
+            });
+            document.body.style.cursor = "default";
+        } else {
+            console.log("주소 변환 실패");
+        }
+    });
+    // 작업 모드 비활성화
+    isHomeModeActive = false;
+
+}
+function onMapClick(event) {
 	const lat = event.latLng.getLat();
 	const lng = event.latLng.getLng();
 
-    if (mode === "addBin" && !isPinModeActive) return;
-    if (mode === "addHome" && !isHomeModeActive) return;
+    if (!isPinModeActive) return;
 
 	// 카카오맵 Geocoder 인스턴스 생성
 	const geocoder = new kakao.maps.services.Geocoder();
@@ -348,17 +416,8 @@ function onMapClick(event, mode) {
 			});
 
 			kakao.maps.event.addListener(addMarker, 'click', () => {
-                if(mode === "addBin") {
-                    window.java.showAddBinDialog(lat, lng, address);  // Java 메서드 호출
-                }else if(mode === "addHome") {
-                    window.java.showAddHomeDialog(lat, lng, address);  // Java 메서드 호출
 
-                    addMarker.setMap(null); // 마커 제거
-                    removeClickListener();
-                    isHomeModeActive = false;
-                    document.body.style.cursor = "default";
-                    if (infowindowAdd) infowindowAdd.close(); // 인포윈도우 닫기
-                }
+                window.java.showAddBinDialog(lat, lng, address);  // Java 메서드 호출
 			})
             document.body.style.cursor = "default";
 		} else {
@@ -367,11 +426,8 @@ function onMapClick(event, mode) {
 	});
 
     // 작업 모드 비활성화
-    if (mode === "addBin") {
-        isPinModeActive = false;
-    } else if (mode === "addHome") {
-        isHomeModeActive = false;
-    }
+    isPinModeActive = false;
+
 }
 function removeClickListener() {
     kakao.maps.event.removeListener(map, 'click', onMapClick); // 기존 클릭 이벤트 제거

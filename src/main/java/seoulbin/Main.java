@@ -188,7 +188,7 @@ public class Main extends JFrame {
         ImageIcon scaledHomeIcon = new ImageIcon(scaledImage);
 
         homeButton.setIcon(scaledHomeIcon);
-        homeButton.setBounds(35, 620, 200, 60); // 적절한 위치로 배치
+        homeButton.setBounds(35, 610, 200, 60); // 적절한 위치로 배치
         homeButton.setFocusPainted(false); // 버튼 포커스 테두리 제거
         homeButton.setBorderPainted(false); // 버튼 테두리 제거
         homeButton.setContentAreaFilled(false); // 배경 제거

@@ -132,18 +132,23 @@ public class MapPanel extends JPanel {
         HomeLocation home = Utils.getHomeLocation();
 
         if (home != null) {
+            // 특수 문자 처리
+            String safeAddress = home.getAddress().replace("'", "\\'").replace("\"", "\\\"");
+
             // JavaScript로 Home 위치 전달
             String script = String.format(
-                    "setHomeCenter(%f, %f); addHomeIcon(%f, %f, '%s');",
+                    "setTimeout(() => { setHomeCenter(%f, %f); addHomeIcon(%f, %f, '%s'); }, 500);",
                     home.getLatitude(), home.getLongitude(),
-                    home.getLatitude(), home.getLongitude(), home.getAddress()
+                    home.getLatitude(), home.getLongitude(), safeAddress
             );
+
             browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
             System.out.println("Home 위치로 초기화됨: " + home.getAddress());
         } else {
             System.out.println("Home 위치가 설정되지 않았습니다. 기본 위치 사용.");
         }
     }
+
 
     // HOME 설정
     public void enableHomeSettingMode() {
@@ -190,7 +195,7 @@ public class MapPanel extends JPanel {
         @JsAccessible // 자바스크립트에서 호출
         public void showAddBinDialog(double lat, double lng, String address) {
             // 기존 AddBtnAction을 호출하는 코드
-            new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
+            AddBtnAction addBtnAction = new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
 
         @JsAccessible
@@ -215,12 +220,16 @@ public class MapPanel extends JPanel {
                             JOptionPane.INFORMATION_MESSAGE
                     );
                     // Home 위치에 아이콘 추가
-                    String script = String.format("addHomeIcon(%f, %f, '%s');", lat, lng, address);
-                    browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
-
+                    String safeAddress = address.replace("'", "\\'");
+                    String script = String.format("addHomeIcon(%f, %f, '%s');", lat, lng, safeAddress);
+                    browser.mainFrame().ifPresent(frame -> {
+                        frame.executeJavaScript(script);
+                        System.out.println("JavaScript addHomeIcon executed successfully.");
+                    });
                     // Home 설정 모드 비활성화
                     isHomeMode=false;
                     browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("document.body.style.cursor = 'default';"));
+                    getHomeLocation();
                 } else {
                     JOptionPane.showMessageDialog(
                             null,

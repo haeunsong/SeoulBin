@@ -183,15 +183,6 @@ public class MapPanel extends JPanel {
             }
         }
 
-//        @JsAccessible // 자바스크립트에서 호출 어떻게 써야할지 모르겠습니다...
-//        public void callJavaMarkerEvent(Double lat, Double lng, String address) {
-//        	markerEvent=new MarkerEvent(lat, lng, address);
-//
-//        	if(markerClickEventListener!=null) {
-//        		markerClickEventListener.markerClicked(lat,lng,address);
-//        	}
-//        }
-
         @JsAccessible // 자바스크립트에서 호출
         public void showAddBinDialog(double lat, double lng, String address) {
             // 기존 AddBtnAction을 호출하는 코드
@@ -247,8 +238,6 @@ public class MapPanel extends JPanel {
                 );
             }
         }
-
-
 
         @JsAccessible
         public double callJavaGetReview(int bin_id) {

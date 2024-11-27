@@ -161,6 +161,18 @@ public class MapPanel extends JPanel {
     public void resetMarkerImage() {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("resetMarkerImage()"));
     }
+    
+    // == 맵 사이즈 재설정 ==
+    public void resizeMap() {
+        SwingUtilities.invokeLater(() -> { // 스윙 변경사항 기다리기
+            Dimension size = getSize(); // 현재 패널사이즈 가져오기
+            String script = String.format("resizeMap(%d, %d)", size.width, size.height);
+//            System.out.println(script);
+            browser.mainFrame().ifPresent(frame -> {
+                frame.executeJavaScript(script); //자바스크립트 실행
+            });
+        });
+    }
 
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
@@ -187,7 +199,7 @@ public class MapPanel extends JPanel {
         @JsAccessible // 자바스크립트에서 호출
         public void showAddBinDialog(double lat, double lng, String address) {
             // 기존 AddBtnAction을 호출하는 코드
-            AddBtnAction addBtnAction = new AddBtnAction(mapPanel,lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
+            AddBtnAction addBtnAction = new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
 
         @JsAccessible

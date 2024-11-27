@@ -27,8 +27,6 @@ import model.Model;
 
 // 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
 class AddBtnAction extends JFrame {
-	private MapPanel mapPanel;  // MapView 객체
-	
 	private String receivedAddress;
 	private double lat;
 	private double lng;
@@ -49,8 +47,7 @@ class AddBtnAction extends JFrame {
 
 	// 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
 	// 'AddBtnAction' 클래스의 수정된 부분
-	public AddBtnAction(MapPanel mapPanel, double lat, double lng, String address) {
-		this.mapPanel = mapPanel;
+	public AddBtnAction(double lat, double lng, String address) {
 		this.lat = lat;
 		this.lng = lng;
 		this.receivedAddress = address;
@@ -297,7 +294,6 @@ class AddBtnAction extends JFrame {
 							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음
 							// 창을 닫을 때 null을 반환 (MapView에서 이를 확인)
-                mapPanel.handleAddBtnActionClosure(null);  // MapView에게 null 값을 전달
 							
 						} else {
 							System.out.println("데이터 베이스에 전달"); // 확인용
@@ -306,7 +302,6 @@ class AddBtnAction extends JFrame {
 							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음
 							// 창을 닫을 때 null을 반환 (MapView에서 이를 확인)
-                mapPanel.handleAddBtnActionClosure(null);  // MapView에게 null 값을 전달
 						}
 					}
 				} else {
@@ -321,7 +316,7 @@ class AddBtnAction extends JFrame {
             @Override
             public void windowClosed(WindowEvent e) {
                 // 창이 닫힐 때 null을 반환 (MapView에서 이를 확인)
-                mapPanel.handleAddBtnActionClosure(null);  // MapView에게 null 값을 전달
+//                mapPanel.handleAddBtnActionClosure(null);  // MapView에게 null 값을 전달
             }
         });
 

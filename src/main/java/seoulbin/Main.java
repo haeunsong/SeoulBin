@@ -113,12 +113,14 @@ public class Main extends JFrame {
         	if(option == JOptionPane.YES_OPTION) {
         		mapPanel.enableBinAddingMode();
         		endPinButton.setVisible(true);  // 핀 찍기 종료 버튼 보이기
+        		mapPanel.resizeMap();
         	}
         });
         // "핀 찍기 종료" 버튼 클릭 이벤트
         endPinButton.addActionListener(e -> {
             mapPanel.disableBinAddingMode();  // 마커 찍기 모드 비활성화
             endPinButton.setVisible(false);  // 핀 찍기 종료 버튼 숨기기
+            mapPanel.resizeMap();
             // reload
             mapPanel.loadTrashBinData();
         });

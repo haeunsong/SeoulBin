@@ -101,6 +101,8 @@ public class Main extends JFrame {
         JButton endPinButton = new JButton("핀 찍기 종료");
         endPinButton.setBounds(35, 510, 200, 40); // 위치 설정
         endPinButton.setFont(new Font("Malgun Gothic", Font.PLAIN, 16));
+        endPinButton.setBorder(BorderFactory.createLineBorder(Color.RED
+        ,3));
         endPinButton.setVisible(false);  // 처음에는 보이지 않음
         leftPanel.add(endPinButton);
         
@@ -117,6 +119,8 @@ public class Main extends JFrame {
         endPinButton.addActionListener(e -> {
             mapPanel.disableBinAddingMode();  // 마커 찍기 모드 비활성화
             endPinButton.setVisible(false);  // 핀 찍기 종료 버튼 숨기기
+            // reload
+            mapPanel.loadTrashBinData();
         });
         
         // 양식이 꺼졌을때 맵 리로드

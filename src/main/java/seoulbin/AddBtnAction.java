@@ -49,7 +49,8 @@ class AddBtnAction extends JFrame {
 
 	// 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
 	// 'AddBtnAction' 클래스의 수정된 부분
-	public AddBtnAction(double lat, double lng, String address) {
+	public AddBtnAction(MapPanel mapPanel, double lat, double lng, String address) {
+		this.mapPanel = mapPanel;
 		this.lat = lat;
 		this.lng = lng;
 		this.receivedAddress = address;
@@ -313,6 +314,7 @@ class AddBtnAction extends JFrame {
 					JOptionPane.showMessageDialog(AddBtnAction.this, "정보 저장이 취소되었습니다.", "취소", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
+
 		});
 		// 창이 닫힐 때 이벤트 리스너 추가 (windowClosed)
         frame.addWindowListener(new WindowAdapter() {

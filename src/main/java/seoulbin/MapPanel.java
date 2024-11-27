@@ -164,6 +164,7 @@ public class MapPanel extends JPanel {
 
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
+        public MapPanel mapPanel;
 
         @JsAccessible // 자바스크립트에서 호출
         public void callJavaMarkerEvent(Integer index, Double lat, Double lng, Integer type) { // 자바스크립트 호출때 사용할 이름
@@ -186,7 +187,7 @@ public class MapPanel extends JPanel {
         @JsAccessible // 자바스크립트에서 호출
         public void showAddBinDialog(double lat, double lng, String address) {
             // 기존 AddBtnAction을 호출하는 코드
-            AddBtnAction addBtnAction = new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
+            AddBtnAction addBtnAction = new AddBtnAction(mapPanel,lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
 
         @JsAccessible

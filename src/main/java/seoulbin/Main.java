@@ -271,6 +271,13 @@ public class Main extends JFrame {
     }
 
     public static void main(String[] args) throws IOException {
+    	try {
+            // Look and Feel 설정
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    	
         new Thread(() -> {
             try {
                 // 로컬 HTTP 서버 시작

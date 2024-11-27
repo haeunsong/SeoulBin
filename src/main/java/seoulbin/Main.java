@@ -71,16 +71,7 @@ public class Main extends JFrame {
                 mapPanel.searchPlaces(keyword);
             }
         });
-        // "현재 위치" 버튼 추가
-        JButton currentLocationButton = new JButton("현재 위치");
-        currentLocationButton.setBounds(35, 200, 200, 40);
-        currentLocationButton.setFont(new Font("Malgun Gothic", Font.PLAIN, 16));
-        leftPanel.add(currentLocationButton);
 
-        // 현재 위치 버튼 이벤트
-        currentLocationButton.addActionListener(e -> {
-            mapPanel.getCurrentLocation();
-        });
         
         // ================ 쓰레기통 리뷰 버튼  =================
         reviewButton = new ReviewButton();
@@ -187,6 +178,28 @@ public class Main extends JFrame {
         stampPageButton.addActionListener(e -> showStampPage());
         stamp = new Stamp(this);
 
+        // 집 아이콘 버튼 생성
+        JButton homeButton = new JButton();
+        ImageIcon homeIcon = new ImageIcon("img/home.png"); // 집 아이콘 경로 설정
+        // 아이콘 크기 조정
+        int iconWidth = 60;  // 원하는 아이콘 너비
+        int iconHeight = 60; // 원하는 아이콘 높이
+        Image scaledImage = homeIcon.getImage().getScaledInstance(iconWidth, iconHeight, Image.SCALE_SMOOTH);
+        ImageIcon scaledHomeIcon = new ImageIcon(scaledImage);
+
+        homeButton.setIcon(scaledHomeIcon);
+        homeButton.setBounds(35, 620, 200, 60); // 적절한 위치로 배치
+        homeButton.setFocusPainted(false); // 버튼 포커스 테두리 제거
+        homeButton.setBorderPainted(false); // 버튼 테두리 제거
+        homeButton.setContentAreaFilled(false); // 배경 제거
+        leftPanel.add(homeButton);
+
+        homeButton.addActionListener(e -> {
+            int option = JOptionPane.showConfirmDialog(Main.this,"HOME 으로 지정할 위치에 마커를 꽂아주세요. 프로그램 시작 시 초기 위치로 지정됩니다.","HOME 지정", JOptionPane.YES_NO_OPTION);
+            if(option == JOptionPane.YES_OPTION) {
+                mapPanel.enableHomeSettingMode();
+            }
+        });
         // 윈도우 닫을 때 엔진 종료
         addWindowListener(new WindowAdapter() {
             @Override

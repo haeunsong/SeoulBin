@@ -1,6 +1,7 @@
 package mapdata;
 // test
 import model.Model;
+import seoulbin.HomeLocation;
 
 import javax.swing.*;
 import java.sql.*;
@@ -382,6 +383,68 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // home 위치 새로 저장
+    public static int saveHomeLocation(double latitude, double longitude, String address) {
+        String query = "INSERT INTO home (latitude, longitude, address) " +
+                "VALUES (?, ?, ?)";
+
+        try (Connection conn = Utils.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setDouble(1, latitude);
+            pstmt.setDouble(2, longitude);
+            pstmt.setString(3, address);
+
+            return pstmt.executeUpdate(); // 성공 시 1 반환
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // 실패
+    }
+
+    // home 위치 수정
+    public static int updateHomeLocation(double latitude, double longitude, String address) {
+        String query = "UPDATE home " +
+                "SET latitude = ?, longitude = ?, address = ? " +
+                "WHERE id = 1";
+
+        try (Connection conn = Utils.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setDouble(1, latitude);
+            pstmt.setDouble(2, longitude);
+            pstmt.setString(3, address);
+
+            return pstmt.executeUpdate(); // 성공 시 업데이트된 행 수 반환
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // 실패
+    }
+
+    // home 위치 가져오기
+    public static HomeLocation getHomeLocation() {
+        String getQuery = "SELECT latitude, longitude, address FROM home LIMIT 1";
+
+        try (Connection conn = getConnection(); // SQLite 연결
+             PreparedStatement pstmt = conn.prepareStatement(getQuery);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                // Home 위치가 존재하면 DTO로 반환
+                double latitude = rs.getDouble("latitude");
+                double longitude = rs.getDouble("longitude");
+                String address = rs.getString("address");
+
+                return new HomeLocation(latitude, longitude, address);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null; // Home 위치가 없을 경우 null 반환
     }
 
 }

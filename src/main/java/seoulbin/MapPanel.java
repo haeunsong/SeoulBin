@@ -24,6 +24,7 @@ public class MapPanel extends JPanel {
     private List<Map<String, Object>> binList; // 쓰레기통 리스트
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
     private boolean isAddingBin = false;
+    private boolean isHomeMode = false;
     private JsObject currentMarker = null;  // 현재 마커를 저장할 변수
     private Object downAddFrame;
     public MapPanel() {
@@ -48,6 +49,8 @@ public class MapPanel extends JPanel {
             browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("initMap();"));
             // 데이터 로드 및 마커 표시
             loadTrashBinData(); // Java에서 데이터 읽고 JavaScript로 전달
+            // Home 위치 전달
+            getHomeLocation();
         });
 
         browser.set(InjectJsCallback.class, params -> {
@@ -125,12 +128,29 @@ public class MapPanel extends JPanel {
         });
     }
 
-    public void getCurrentLocation() {
-        String script = String.format("getCurrentLocation()");
-        browser.mainFrame().ifPresent(frame -> {
-            frame.executeJavaScript(script);
-        });
+    public void getHomeLocation(){
+        HomeLocation home = Utils.getHomeLocation();
+
+        if (home != null) {
+            // JavaScript로 Home 위치 전달
+            String script = String.format(
+                    "setHomeCenter(%f, %f); addHomeIcon(%f, %f, '%s');",
+                    home.getLatitude(), home.getLongitude(),
+                    home.getLatitude(), home.getLongitude(), home.getAddress()
+            );
+            browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
+            System.out.println("Home 위치로 초기화됨: " + home.getAddress());
+        } else {
+            System.out.println("Home 위치가 설정되지 않았습니다. 기본 위치 사용.");
+        }
     }
+
+    // HOME 설정
+    public void enableHomeSettingMode() {
+        isHomeMode=true;
+        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addHome()"));
+    }
+
 
   //================== 쓰레기통 마커 초기화(클릭해체)-------
     public void resetMarkerImage() {
@@ -168,10 +188,58 @@ public class MapPanel extends JPanel {
 //        }
 
         @JsAccessible // 자바스크립트에서 호출
-        public void showAddBinDialog(double lat, double lng,String address) {
+        public void showAddBinDialog(double lat, double lng, String address) {
             // 기존 AddBtnAction을 호출하는 코드
             new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
+
+        @JsAccessible
+        public void showAddHomeDialog(double lat, double lng, String address) {
+            // 사용자 확인 다이얼로그
+            int confirm = JOptionPane.showConfirmDialog(
+                    null,
+                    "현재 위치를 HOME으로 설정하시겠습니까?\n주소: " + address,
+                    "HOME 설정",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Home 위치 업데이트 시도 - 항상 id 1 번에 저장된다.
+                int result = Utils.updateHomeLocation(lat, lng, address);
+
+                if (result > 0) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Home 위치가 성공적으로 저장되었습니다!",
+                            "HOME 설정 완료",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                    // Home 위치에 아이콘 추가
+                    String script = String.format("addHomeIcon(%f, %f, '%s');", lat, lng, address);
+                    browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
+
+                    // Home 설정 모드 비활성화
+                    isHomeMode=false;
+                    browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("document.body.style.cursor = 'default';"));
+                } else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Home 위치 저장에 실패했습니다. 다시 시도해주세요.",
+                            "HOME 설정 실패",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            } else {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "HOME 설정이 취소되었습니다.",
+                        "HOME 설정 취소",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
+        }
+
+
 
         @JsAccessible
         public double callJavaGetReview(int bin_id) {

@@ -10,11 +10,14 @@ public class ReviewDialog extends JDialog {
     JPanel panel;
     int bin_index;
     ReviewButton reviewButton;
+    int review;
+    
     public ReviewDialog(JFrame frame, ReviewButton reviewButton,int bin_index) {
-        super(frame, "리뷰 추가", true);
+        super(frame, "별점 선택", true);
         this.bin_index = bin_index;
         this.reviewButton = reviewButton;
-
+        this.review = reviewButton.getReview();
+        
         panel = new JPanel();
         panel.setLayout(new FlowLayout());
         
@@ -24,18 +27,21 @@ public class ReviewDialog extends JDialog {
             panel.add(stars[i]);
         }
         add(panel);
+        setResizable(false);
         setLocationRelativeTo(frame);
         setSize(300, 100);
 
-        SwingUtilities.invokeLater(() -> {
-            requestFocusInWindow();
-            setFocusable(true);
-            setVisible(true);
-        });
+//        requestFocusInWindow();
+        setFocusable(false);
+        setVisible(true);
     }
 
     private JLabel createStarLabel(int index, JLabel[] stars) {
-        JLabel label = new JLabel("☆");
+        String str = "";
+        if (review >= index+1) str = "★";
+        else str = "☆";
+        
+        JLabel label = new JLabel(str);
         label.setFont(new Font("Malgun gothic", Font.BOLD, 40));
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // 커서  모양 바꾸기
 
@@ -43,6 +49,11 @@ public class ReviewDialog extends JDialog {
             @Override
             public void mouseEntered(MouseEvent e) {
                 updateStars(index, stars); // 별 그리기
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                updateStars(review-1, stars); // 리뷰는 1부터 시작이라서 >> - 1
             }
 
             @Override
@@ -56,7 +67,6 @@ public class ReviewDialog extends JDialog {
                     // 리뷰 새로 추가
                     Utils.addBinReview(bin_index, index + 1); //1부터 시작이라서 (1추가) // 별 인덱스는 0
                 }
-                reviewButton.resetReview();
                 dispose();
             }
         });

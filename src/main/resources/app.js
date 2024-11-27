@@ -57,8 +57,8 @@ function loadTrashBins(data) {
         const imageSrc = type === "0"
             ? 'general.png' // 일반 쓰레기통
             : 'recycle.png'; // 재활용 쓰레기통
-        const imageSize = new kakao.maps.Size(45, 45); // 마커 이미지 크기
-        const imageOption = {offset: new kakao.maps.Point(18, 36)}; // 마커 중심 좌표 설정
+        const imageSize = new kakao.maps.Size(40, 40); // 마커 이미지 크기
+        const imageOption = {offset: new kakao.maps.Point(20, 40)}; // 마커 중심 좌표 설정
         const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
         const markerPosition = new kakao.maps.LatLng(bin.latitude, bin.longitude);
@@ -206,7 +206,7 @@ function filterMarkers(type) {
 // 마커 체크마커 이미지 원래대로 돌리기
 function resetMarkerImage() {
     clickedMarker.setImage(new kakao.maps.MarkerImage(clickedMarker.type === "general" ? 'general.png': 'recycle.png',
-         new kakao.maps.Size(45, 45), { offset: new kakao.maps.Point(18, 36) }));
+         new kakao.maps.Size(40, 40), { offset: new kakao.maps.Point(20, 40) }));
     clickedMarker = null;
 }
 

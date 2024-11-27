@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Scanner;
+import com.formdev.flatlaf.FlatLightLaf;
 
 public class Main extends JFrame {
     private JPanel mainPanel;
@@ -74,7 +75,7 @@ public class Main extends JFrame {
 
         
         // ================ 쓰레기통 리뷰 버튼  =================
-        reviewButton = new ReviewButton();
+        reviewButton = new ReviewButton("별점 선택");
         reviewButton.setBounds(35, 420, 200, 40); // 검색 버튼 아래에 위치
         reviewButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(reviewButton);
@@ -154,8 +155,6 @@ public class Main extends JFrame {
                 	mapPanel.deleteBin(marker.index);
                     marker = null;
                     
-                    // 리뷰 버튼도 초기화
-                    reviewButton.resetReview();
                     // 쓰레기통 로딩 다시
                     mapPanel.loadTrashBinData();
                 }
@@ -223,8 +222,6 @@ public class Main extends JFrame {
                 marker = e;
                 if (e != null) {
                     reviewButton.loadReview(e.index);
-                } else {
-                    reviewButton.resetReview();
                 }
             }
         });

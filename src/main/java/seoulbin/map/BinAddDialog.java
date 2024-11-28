@@ -19,12 +19,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import seoulbin.model.Model;
+import seoulbin.ai.Model;
 import seoulbin.utils.BinUtils;
 
 
 // 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
-class AddBtnAction extends JFrame {
+public class BinAddDialog extends JFrame {
 	private String receivedAddress;
 	private double lat;
 	private double lng;
@@ -45,7 +45,7 @@ class AddBtnAction extends JFrame {
 
 	// 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
 	// 'AddBtnAction' 클래스의 수정된 부분
-	public AddBtnAction(double lat, double lng, String address) {
+	public BinAddDialog(double lat, double lng, String address) {
 		this.lat = lat;
 		this.lng = lng;
 		this.receivedAddress = address;
@@ -210,31 +210,31 @@ class AddBtnAction extends JFrame {
 				// 주소입력은 없어서 스킵
 				// 텍스트 필드 값 확인
 				if (cityText.isEmpty()) {
-					JOptionPane.showMessageDialog(AddBtnAction.this, "지역구를 입력해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(BinAddDialog.this, "지역구를 입력해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
 					cityField.requestFocus(); // 주소 텍스트 필드로 포커스 이동
 					return;
 				}
 
 				if (detailText.isEmpty()) {
-					JOptionPane.showMessageDialog(AddBtnAction.this, "상세 정보를 입력해주세요.", "경고",
+					JOptionPane.showMessageDialog(BinAddDialog.this, "상세 정보를 입력해주세요.", "경고",
 							JOptionPane.WARNING_MESSAGE);
 					detailField.requestFocus(); // 상세 정보 텍스트 필드로 포커스 이동
 					return;
 				}
 				// 체크박스1 확인
 				if (!isCheckBox1Selected && !isCheckBox2Selected) {
-					JOptionPane.showMessageDialog(AddBtnAction.this, "옵션을 체크해주십시오.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(BinAddDialog.this, "옵션을 체크해주십시오.", "경고", JOptionPane.WARNING_MESSAGE);
 					general.requestFocus(); // 체크박스 중 첫 번째에 포커스 이동
 					return;// 경고 후 처리 종료
 				}
 				// 이미지 확인
 				if (selectedImageLabel.getIcon() == null) {
-					JOptionPane.showMessageDialog(AddBtnAction.this, "이미지를 선택해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(BinAddDialog.this, "이미지를 선택해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 				// 동의 확인
 				if (!isRadioButton2_1Selected) {
-					JOptionPane.showMessageDialog(AddBtnAction.this, "동의해주십시오.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(BinAddDialog.this, "동의해주십시오.", "경고", JOptionPane.WARNING_MESSAGE);
 					agreeRadioButton.requestFocus(); // 체크박스 중 첫 번째에 포커스 이동
 					return;// 경고 후 처리 종료
 				}
@@ -258,10 +258,10 @@ class AddBtnAction extends JFrame {
 
 				if (binResult == 0) {
 					// 쓰레기통이 아닌 경우 경고 메시지
-					JOptionPane.showMessageDialog(AddBtnAction.this, "쓰레기통으로 인식되지 않았습니다.", "경고",JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(BinAddDialog.this, "쓰레기통으로 인식되지 않았습니다.", "경고",JOptionPane.WARNING_MESSAGE);
 					return; // 경고 메시지 후 종료
 				}else if(binResult == 1) {
-					JOptionPane.showMessageDialog(AddBtnAction.this,"쓰레기통으로 인식되었습니다.", "정보", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(BinAddDialog.this,"쓰레기통으로 인식되었습니다.", "정보", JOptionPane.INFORMATION_MESSAGE);
 				}
 
 				String message = "주소: " + receivedAddress + "\n" + "지역구: " + cityText + "\n" + "상세 정보: " + detailText
@@ -269,29 +269,29 @@ class AddBtnAction extends JFrame {
 						"사진 : 첨부됨.";
 
 				// 정보 표시
-				JOptionPane.showMessageDialog(AddBtnAction.this, message, "입력된 정보", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(BinAddDialog.this, message, "입력된 정보", JOptionPane.INFORMATION_MESSAGE);
 
 				// 확인 후 데이터베이스에 전달
-				int result = JOptionPane.showConfirmDialog(AddBtnAction.this, "정보를 데이터베이스에 저장하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
+				int result = JOptionPane.showConfirmDialog(BinAddDialog.this, "정보를 데이터베이스에 저장하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
 				if (result == JOptionPane.YES_OPTION) {
 					// 데베에 전달: 주소, 체크박스 체크여부 2개, 이미지 경로
 					if (getCheckBoxValue(general, recycle) == 0 || getCheckBoxValue(general, recycle) == 1 || getCheckBoxValue(general, recycle) == 2) {
 						if (getCheckBoxValue(general, recycle) == 2) {
 							BinUtils.addBinData(lat, lng, 0, detailText, cityText, imagePath);
 							BinUtils.addBinData(lat, lng, 1, detailText, cityText, imagePath);
-							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(BinAddDialog.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음
 						} else {
 							System.out.println("쓰레기통 추가 정보가 정상적으로 데이터베이스에 전달되었습니다."); // 확인용
 							BinUtils.addBinData(lat, lng, getCheckBoxValue(general, recycle), detailText, cityText,
 									imagePath);
-							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(BinAddDialog.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음
 						}
 					}
 				} else {
 					// 저장을 취소한 경우
-					JOptionPane.showMessageDialog(AddBtnAction.this, "정보 저장이 취소되었습니다.", "취소", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(BinAddDialog.this, "정보 저장이 취소되었습니다.", "취소", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});

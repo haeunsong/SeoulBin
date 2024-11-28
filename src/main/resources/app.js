@@ -169,8 +169,6 @@ function generateStarRating(review) {
 // 3. 장소 검색
 function searchPlaces(keyword) {
 
-   // clearMarkers();
-
     places.keywordSearch(keyword, (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
             let place = result[0];

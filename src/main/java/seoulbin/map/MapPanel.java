@@ -7,6 +7,7 @@ import com.teamdev.jxbrowser.js.JsObject;
 import com.teamdev.jxbrowser.navigation.event.*;
 import com.teamdev.jxbrowser.view.swing.BrowserView;
 import seoulbin.browser.BrowserManager;
+import seoulbin.model.MarkerEvent;
 import seoulbin.service.BinService;
 import seoulbin.service.HomeService;
 import seoulbin.utils.BinUtils;
@@ -82,7 +83,6 @@ public class MapPanel extends JPanel {
             });
         });
     }
-
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
 
@@ -107,7 +107,7 @@ public class MapPanel extends JPanel {
         @JsAccessible // 자바스크립트에서 호출
         public void showAddBinDialog(double lat, double lng, String address) {
             // 기존 AddBtnAction을 호출하는 코드
-            AddBtnAction addBtnAction = new AddBtnAction(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
+            BinAddDialog binAddDialog = new BinAddDialog(lat, lng, address);  // AddBtnAction을 호출하면서 주소를 전달
         }
 
         @JsAccessible

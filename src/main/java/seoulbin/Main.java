@@ -1,6 +1,8 @@
 package seoulbin;
 
 import seoulbin.browser.BrowserManager;
+import seoulbin.review.ReviewDialog;
+import seoulbin.model.MarkerEvent;
 import seoulbin.map.*;
 import seoulbin.service.BinService;
 import seoulbin.service.HomeService;
@@ -22,12 +24,16 @@ public class Main extends JFrame {
     private HomeService homeService;
 
     private JPanel mainPanel;
+    private JPanel leftPanel;
+    private JPanel rightPanel;
+
     private JLabel dateTimeLabel;
     private MapPanel mapPanel;
     private Stamp stamp;
     private MarkerEvent marker;
     private ReviewButton reviewButton;
-    
+    private JButton endPinButton;
+
     public Main() throws IOException {
         this.browserManager = new BrowserManager();
         this.binService = new BinService(browserManager);
@@ -39,9 +45,53 @@ public class Main extends JFrame {
 
         mainPanel = new JPanel(new BorderLayout());
         mapPanel = new MapPanel(binService, homeService, browserManager);
+        leftPanel = new JPanel(new BorderLayout());
+        rightPanel = new JPanel(new BorderLayout());
 
-        // 왼쪽 패널 설정
-        JPanel leftPanel = new JPanel();
+        drawLeftPanel();
+        drawRightPanel();
+
+        // 윈도우 닫을 때 엔진 종료
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                browserManager.closeEngine();
+            }
+        });
+
+        // 마커 클릭 시
+        mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
+            @Override
+            public void markerClicked(MarkerEvent e) { // MarkerEvent.index
+                marker = e;
+                if (e != null) {
+                    reviewButton.loadReview(e.index);
+                }
+            }
+        });
+
+        // 프레임에 패널 추가
+        add(leftPanel, BorderLayout.WEST);
+        add(rightPanel, BorderLayout.CENTER);
+
+        mainPanel.add(leftPanel, BorderLayout.WEST);
+        mainPanel.add(rightPanel, BorderLayout.CENTER);
+
+        add(mainPanel);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        setVisible(true);
+
+        // 날짜와 시간을 주기적으로 업데이트하는 타이머
+        Timer timer = new Timer(1000, e -> dateTimeLabel.setText(getCurrentDateTime()));
+        timer.start();
+    }
+
+
+    private void drawLeftPanel() throws IOException {
+
         leftPanel.setPreferredSize(new Dimension(270, 800));
         leftPanel.setLayout(null); // 절대 위치 배치
         leftPanel.setBackground(Color.decode("#edede9"));
@@ -63,10 +113,10 @@ public class Main extends JFrame {
         searchField.setBounds(35, 120, 200, 40);
         searchField.setFont(new Font("Malgun gothic", Font.BOLD, 16));
         leftPanel.add(searchField);
-        
+
         // 검색 필드 엔터 검색 이벤트
         searchField.addActionListener(e -> {
-        	String keyword = searchField.getText().trim();
+            String keyword = searchField.getText().trim();
             if (keyword.isEmpty()) {
                 JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
             } else {
@@ -74,7 +124,8 @@ public class Main extends JFrame {
                 binService.searchPlaces(keyword);
             }
         });
-        // ================ 검색 버튼  =================
+
+        // 검색 버튼
         JButton searchButton = new JButton("검색");
         searchButton.setBounds(35, 160, 80, 30);
         searchButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
@@ -91,8 +142,7 @@ public class Main extends JFrame {
             }
         });
 
-        
-        // ================ 쓰레기통 리뷰 버튼  =================
+        // 쓰레기통 리뷰 버튼
         reviewButton = new ReviewButton("별점 선택");
         reviewButton.setBounds(35, 420, 200, 40); // 검색 버튼 아래에 위치
         reviewButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
@@ -109,53 +159,34 @@ public class Main extends JFrame {
             }
         });
 
-        // ================ 쓰레기통 추가 버튼  =================
-        // "쓰레기통 추가" 버튼 생성
+        // 쓰레기통 추가 버튼
         JButton addBinButton = new JButton("쓰레기통 추가");
         addBinButton.setBounds(35, 460, 200, 40); // 검색 버튼 아래에 위치
         addBinButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(addBinButton);
-        
-        // 핀 찍기 종료 버튼
-        JButton endPinButton = new JButton("핀 찍기 종료");
-        endPinButton.setBounds(35, 510, 200, 40); // 위치 설정
-        endPinButton.setFont(new Font("Malgun Gothic", Font.PLAIN, 16));
-        endPinButton.setBorder(BorderFactory.createLineBorder(Color.RED
-        ,3));
-        endPinButton.setVisible(false);  // 처음에는 보이지 않음
-        leftPanel.add(endPinButton);
-        
         // "쓰레기통 추가" 버튼 이벤트
         addBinButton.addActionListener(e -> {
-        	int option=JOptionPane.showConfirmDialog(Main.this, "원하는 위치에 마커를 꽂아주세요.","쓰레기통 추가",JOptionPane.YES_NO_OPTION);;
-        	
-        	if(option == JOptionPane.YES_OPTION) {
-        		binService.enableBinAddingMode();
-        		endPinButton.setVisible(true);  // 핀 찍기 종료 버튼 보이기
-        		mapPanel.resizeMap();
-        	}
-        });
-        // "핀 찍기 종료" 버튼 클릭 이벤트
-        endPinButton.addActionListener(e -> {
-            binService.disableBinAddingMode();  // 마커 찍기 모드 비활성화
-            endPinButton.setVisible(false);  // 핀 찍기 종료 버튼 숨기기
-            mapPanel.resizeMap();
-            binService.loadTrashBinData();
+            int option=JOptionPane.showConfirmDialog(Main.this, "원하는 위치에 마커를 꽂아주세요.","쓰레기통 추가",JOptionPane.YES_NO_OPTION);;
+
+            if(option == JOptionPane.YES_OPTION) {
+                binService.enableBinAddingMode();
+                endPinButton.setVisible(true);  // 핀 찍기 종료 버튼 보이기
+                mapPanel.resizeMap();
+            }
         });
 
-        // ================ 쓰레기통 삭제 버튼  =================
+        // 쓰레기통 삭제 버튼
         JButton deleteBinButton = new JButton("쓰레기통 삭제");
         deleteBinButton.setBounds(35, 500, 200, 40); // "쓰레기통 추가" 버튼 바로 아래에 위치
         deleteBinButton.setFont(new Font("Malgun gothic", Font.PLAIN, 16));
         leftPanel.add(deleteBinButton);
-
         // 쓰레기통 삭제 버튼 이벤트
         deleteBinButton.addActionListener(e -> {
             if (marker != null) {
                 int result = JOptionPane.showConfirmDialog(this,
                         "정말 삭제하시겠습니까?", "Mesaage", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
-                	binService.deleteBin(marker.index);
+                    binService.deleteBin(marker.index);
                     marker = null;
                     binService.loadTrashBinData();
                 }
@@ -164,17 +195,6 @@ public class Main extends JFrame {
                         "Message", JOptionPane.ERROR_MESSAGE);
             }
         });
-
-        // 오른쪽 패널 설정 (지도 표시 영역)
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.setPreferredSize(new Dimension(730, 800));
-
-        // 오른쪽 패널에 mapPanel 추가
-        rightPanel.add(mapPanel, BorderLayout.CENTER);
-        
-        // 오른쪽 패널에 mapPanel 추가
-        rightPanel.add(endPinButton, BorderLayout.NORTH);
-
         // "스탬프 페이지 이동" 버튼 생성
         JButton stampPageButton = new JButton("스탬프 페이지");
         stampPageButton.setBounds(35, 540, 200, 40);
@@ -206,44 +226,35 @@ public class Main extends JFrame {
                 homeService.enableHomeSettingMode();
             }
         });
-        // 윈도우 닫을 때 엔진 종료
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                browserManager.closeEngine();
-            }
-        });
-
-        // 마커 클릭 예시
-        mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
-            @Override
-            public void markerClicked(MarkerEvent e) { // MarkerEvent.index
-                marker = e;
-                if (e != null) {
-                    reviewButton.loadReview(e.index);
-                }
-            }
-        });
-
-        // 프레임에 패널 추가
-        add(leftPanel, BorderLayout.WEST);
-        add(rightPanel, BorderLayout.CENTER);
-
-        mainPanel.add(leftPanel, BorderLayout.WEST);
-        mainPanel.add(rightPanel, BorderLayout.CENTER);
-
-        add(mainPanel);
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-
-        setVisible(true);
-
-        // 날짜와 시간을 주기적으로 업데이트하는 타이머
-        Timer timer = new Timer(1000, e -> dateTimeLabel.setText(getCurrentDateTime()));
-        timer.start();
     }
 
+    private void drawRightPanel() {
+        // 핀 찍기 종료 버튼
+        endPinButton = new JButton("핀 찍기 종료");
+        endPinButton.setBounds(35, 510, 200, 40); // 위치 설정
+        endPinButton.setFont(new Font("Malgun Gothic", Font.PLAIN, 16));
+        endPinButton.setBorder(BorderFactory.createLineBorder(Color.RED
+                ,3));
+        endPinButton.setVisible(false);  // 처음에는 보이지 않음
+        rightPanel.add(endPinButton);
+
+        // "핀 찍기 종료" 버튼 클릭 이벤트
+        endPinButton.addActionListener(e -> {
+            binService.disableBinAddingMode();  // 마커 찍기 모드 비활성화
+            endPinButton.setVisible(false);  // 핀 찍기 종료 버튼 숨기기
+            mapPanel.resizeMap();
+            binService.loadTrashBinData();
+        });
+
+        // 오른쪽 패널 설정 (지도 표시 영역)
+        rightPanel.setPreferredSize(new Dimension(730, 800));
+
+        // 오른쪽 패널에 mapPanel 추가
+        rightPanel.add(mapPanel, BorderLayout.CENTER);
+
+        rightPanel.add(endPinButton, BorderLayout.NORTH);
+
+    }
     public void showStampPage() {
         getContentPane().removeAll();
         add(stamp);
@@ -251,7 +262,7 @@ public class Main extends JFrame {
         repaint();
     }
 
-//    // 메인 페이지로 복귀
+    // 메인 페이지로 복귀
     public void showMainPage() {
         getContentPane().removeAll();
         add(mainPanel);

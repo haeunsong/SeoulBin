@@ -1,8 +1,8 @@
 package seoulbin.utils;
 
 
-import seoulbin.model.Model;
-import seoulbin.map.HomeLocation;
+import seoulbin.ai.Model;
+import seoulbin.model.HomeLocation;
 
 import java.sql.*;
 import java.util.ArrayList;

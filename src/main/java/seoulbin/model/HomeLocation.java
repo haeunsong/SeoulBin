@@ -1,4 +1,4 @@
-package seoulbin.map;
+package seoulbin.model;
 
 public class HomeLocation {
     private final double latitude;

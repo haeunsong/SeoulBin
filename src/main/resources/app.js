@@ -169,7 +169,7 @@ function generateStarRating(review) {
 // 3. 장소 검색
 function searchPlaces(keyword) {
 
-    //clearMarkers();
+   // clearMarkers();
 
     places.keywordSearch(keyword, (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
@@ -177,14 +177,7 @@ function searchPlaces(keyword) {
             let lat = place.y;
             let lng = place.x;
             let name = place.place_name;
-			
-			/*
-            const marker = new kakao.maps.Marker({
-                position: new kakao.maps.LatLng(lat, lng),
-                map: map
-            });
-            searchMarkers.push(marker);
-			*/
+
             map.setCenter(new kakao.maps.LatLng(lat, lng));
 			map.setLevel(5);
 
@@ -193,13 +186,6 @@ function searchPlaces(keyword) {
         }
     });
 }
-
-/*
-function clearMarkers() {
-	searchMarkers.forEach(marker => marker.setMap(null)); // 지도에서 제거
-	searchMarkers = []; // 배열 초기화
-}
-*/
 
 // 마커 필터링 함수
 function filterMarkers(type) {

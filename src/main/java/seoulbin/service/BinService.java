@@ -50,7 +50,6 @@ public class BinService {
 
     // 쓰레기통 위치 검색 (장소 검색)
     public void searchPlaces(String keyword) {
-        browserManager.executeJavaScript(String.format("searchPlaces(%s);", keyword.replace("'", "\\'")));
+        browserManager.executeJavaScript(String.format("searchPlaces('%s');",keyword));
     }
-
 }

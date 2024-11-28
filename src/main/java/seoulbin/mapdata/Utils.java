@@ -1,6 +1,6 @@
-package mapdata;
+package seoulbin.mapdata;
 
-import model.Model;
+import seoulbin.model.Model;
 import seoulbin.HomeLocation;
 
 import java.sql.*;
@@ -14,7 +14,7 @@ public class Utils {
     private static Connection connection;
 
     public static Connection getConnection() throws SQLException {
-        String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
+        String url = "jdbc:sqlite:src/main/java/seoulbin.database/seoulbin.sqlite3";
         return DriverManager.getConnection(url);
     }
 
@@ -199,7 +199,7 @@ public class Utils {
        return: 0 if success, -1 if failure
    */
     public static int deleteBinData(int bin_id) {
-        String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
+        String url = "jdbc:sqlite:src/main/java/seoulbin.database/seoulbin.sqlite3";
         String deleteQuery = "DELETE FROM binList WHERE bin_id = ?";
 
         try (Connection conn = DriverManager.getConnection(url);

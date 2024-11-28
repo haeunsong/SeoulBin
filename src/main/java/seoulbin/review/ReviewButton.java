@@ -1,7 +1,7 @@
 package seoulbin.review;
 
 import javax.swing.*;
-import mapdata.Utils;
+import seoulbin.mapdata.Utils;
 
 public class ReviewButton extends JButton {
     int review = 0;

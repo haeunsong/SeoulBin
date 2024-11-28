@@ -1,6 +1,6 @@
 package seoulbin.stamp;
 
-import mapdata.Utils;
+import seoulbin.mapdata.Utils;
 import seoulbin.Main;
 
 import javax.imageio.ImageIO;

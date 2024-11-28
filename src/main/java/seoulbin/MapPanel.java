@@ -11,7 +11,7 @@ import com.teamdev.jxbrowser.js.JsAccessible;
 import com.teamdev.jxbrowser.js.JsObject;
 import com.teamdev.jxbrowser.navigation.event.*;
 import com.teamdev.jxbrowser.view.swing.BrowserView;
-import mapdata.Utils;
+import seoulbin.mapdata.Utils;
 
 import javax.swing.*;
 import java.awt.*;

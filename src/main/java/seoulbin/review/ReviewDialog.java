@@ -1,6 +1,6 @@
 package seoulbin.review;
 
-import mapdata.Utils;
+import seoulbin.mapdata.Utils;
 
 import javax.swing.*;
 import java.awt.event.*;

@@ -19,8 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import mapdata.Utils;
-import model.Model;
+import seoulbin.mapdata.Utils;
+import seoulbin.model.Model;
 
 
 // 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.

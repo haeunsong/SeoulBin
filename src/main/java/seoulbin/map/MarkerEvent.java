@@ -1,4 +1,4 @@
-package seoulbin;
+package seoulbin.map;
 
 /*
 mapPanel의 자바스크립트 마커클릭 이벤트 발생 시

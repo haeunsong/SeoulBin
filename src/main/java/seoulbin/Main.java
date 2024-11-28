@@ -1,7 +1,9 @@
 package seoulbin;
-// 텍스트 엔터 검색 // 검색시 map.level()없다는 에러 메시지 제거
-// 맵 로딩할 때 인포 닫기
-// 검색시 마커 제거
+
+import seoulbin.browser.BrowserManager;
+import seoulbin.map.*;
+import seoulbin.service.BinService;
+import seoulbin.service.HomeService;
 import seoulbin.stamp.Stamp;
 import seoulbin.review.*;
 
@@ -15,6 +17,10 @@ import java.util.Locale;
 import com.formdev.flatlaf.FlatLightLaf;
 
 public class Main extends JFrame {
+    private BrowserManager browserManager;
+    private BinService binService;
+    private HomeService homeService;
+
     private JPanel mainPanel;
     private JLabel dateTimeLabel;
     private MapPanel mapPanel;
@@ -23,12 +29,16 @@ public class Main extends JFrame {
     private ReviewButton reviewButton;
     
     public Main() throws IOException {
+        this.browserManager = new BrowserManager();
+        this.binService = new BinService(browserManager);
+        this.homeService = new HomeService(browserManager);
+
         setSize(1000, 800);
         setTitle("SeoulBin 서울시 쓰레기통 위치 제공 서비스");
         setLayout(new BorderLayout());
 
         mainPanel = new JPanel(new BorderLayout());
-        mapPanel = new MapPanel();
+        mapPanel = new MapPanel(binService, homeService, browserManager);
 
         // 왼쪽 패널 설정
         JPanel leftPanel = new JPanel();
@@ -61,7 +71,7 @@ public class Main extends JFrame {
                 JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
             } else {
                 // JavaScript의 searchPlaces 함수 호출
-                mapPanel.searchPlaces(keyword);
+                binService.searchPlaces(keyword);
             }
         });
         // ================ 검색 버튼  =================
@@ -77,7 +87,7 @@ public class Main extends JFrame {
                 JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
             } else {
                 // JavaScript의 searchPlaces 함수 호출
-                mapPanel.searchPlaces(keyword);
+                binService.searchPlaces(keyword);
             }
         });
 
@@ -120,18 +130,17 @@ public class Main extends JFrame {
         	int option=JOptionPane.showConfirmDialog(Main.this, "원하는 위치에 마커를 꽂아주세요.","쓰레기통 추가",JOptionPane.YES_NO_OPTION);;
         	
         	if(option == JOptionPane.YES_OPTION) {
-        		mapPanel.enableBinAddingMode();
+        		binService.enableBinAddingMode();
         		endPinButton.setVisible(true);  // 핀 찍기 종료 버튼 보이기
         		mapPanel.resizeMap();
         	}
         });
         // "핀 찍기 종료" 버튼 클릭 이벤트
         endPinButton.addActionListener(e -> {
-            mapPanel.disableBinAddingMode();  // 마커 찍기 모드 비활성화
+            binService.disableBinAddingMode();  // 마커 찍기 모드 비활성화
             endPinButton.setVisible(false);  // 핀 찍기 종료 버튼 숨기기
             mapPanel.resizeMap();
-            // reload
-            mapPanel.loadTrashBinData();
+            binService.loadTrashBinData();
         });
 
         // ================ 쓰레기통 삭제 버튼  =================
@@ -146,12 +155,9 @@ public class Main extends JFrame {
                 int result = JOptionPane.showConfirmDialog(this,
                         "정말 삭제하시겠습니까?", "Mesaage", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
-                    // 삭제하는 부분
-                	mapPanel.deleteBin(marker.index);
+                	binService.deleteBin(marker.index);
                     marker = null;
-                    
-                    // 쓰레기통 로딩 다시
-                    mapPanel.loadTrashBinData();
+                    binService.loadTrashBinData();
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "마커를 클릭하세요.",
@@ -197,14 +203,14 @@ public class Main extends JFrame {
         homeButton.addActionListener(e -> {
             int option = JOptionPane.showConfirmDialog(Main.this,"HOME 으로 지정할 위치에 마커를 꽂아주세요. 프로그램 시작 시 초기 위치로 지정됩니다.","HOME 지정", JOptionPane.YES_NO_OPTION);
             if(option == JOptionPane.YES_OPTION) {
-                mapPanel.enableHomeSettingMode();
+                homeService.enableHomeSettingMode();
             }
         });
         // 윈도우 닫을 때 엔진 종료
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                mapPanel.engineClose();
+                browserManager.closeEngine();
             }
         });
 

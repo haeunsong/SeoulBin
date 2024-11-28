@@ -1,4 +1,4 @@
-package seoulbin;
+package seoulbin.map;
 
 @FunctionalInterface
 public interface MarkerClickEventListener {

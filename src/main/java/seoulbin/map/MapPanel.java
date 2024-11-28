@@ -1,56 +1,54 @@
-package seoulbin;
+package seoulbin.map;
 
-import static com.teamdev.jxbrowser.engine.RenderingMode.HARDWARE_ACCELERATED;
-
-import com.google.gson.Gson;
 import com.teamdev.jxbrowser.browser.Browser;
 import com.teamdev.jxbrowser.browser.callback.InjectJsCallback;
-import com.teamdev.jxbrowser.engine.Engine;
-import com.teamdev.jxbrowser.engine.EngineOptions;
 import com.teamdev.jxbrowser.js.JsAccessible;
 import com.teamdev.jxbrowser.js.JsObject;
 import com.teamdev.jxbrowser.navigation.event.*;
 import com.teamdev.jxbrowser.view.swing.BrowserView;
-import seoulbin.mapdata.Utils;
+import seoulbin.browser.BrowserManager;
+import seoulbin.service.BinService;
+import seoulbin.service.HomeService;
+import seoulbin.utils.BinUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.Map;
 
 public class MapPanel extends JPanel {
+    private final BrowserManager browserManager;
     private final Browser browser;
-    private final Engine engine;
+    private final BinService binService;
+    private final HomeService homeService;
+
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
-    private boolean isAddingBin = false;
-    private boolean isHomeMode = false;
+   // private boolean isAddingBin = false;
+    // private boolean isHomeMode = false;
 
-    public MapPanel() {
-        // 1. JxBrowser 엔진 초기화
-        engine = Engine.newInstance(EngineOptions.newBuilder(HARDWARE_ACCELERATED)
-                .licenseKey("OK6AEKNYF2J46TGUSGVWFCL96HY8PYV11PUSURQ08A66MHBZA4TDH0Y6D09OZJ0L6BRGXSCIFY0F144KAMG1F7O5GHDM3PATIN4WNZCEGBXE0L3Y2UHDX3RGK4K1DSJUO9C6LYTJYAQG2NHON")
-                .build());
-        browser = engine.newBrowser();
-        browser.devTools().show();
+    public MapPanel(BinService binService, HomeService homeService, BrowserManager browserManager) {
+        this.binService = binService;
+        this.homeService = homeService;
+        this.browserManager = browserManager;
+        this.browser = browserManager.getBrowser();
 
-        // 2. JxBrowser UI 설정
-        BrowserView view = BrowserView.newInstance(browser);
+        // JxBrowser UI 설정
+        BrowserView view = BrowserView.newInstance(browserManager.getBrowser());
         setLayout(new BorderLayout());
         add(view, BorderLayout.CENTER);
 
-        // 3. HTML 페이지 로드
+        // HTML 페이지 로드
         browser.navigation().loadUrl("localhost:8088/map");
 
-        // 4. 브라우저 로드 완료 후 작업
+        // 브라우저 로드 완료 후 작업
         browser.navigation().on(LoadFinished.class, event -> {
             // 지도 초기화 (JavaScript에서 실행)
-            browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("initMap();"));
+            browserManager.executeJavaScript("initMap();");
             // 데이터 로드 및 마커 표시
-            loadTrashBinData(); // Java에서 데이터 읽고 JavaScript로 전달
+            binService.loadTrashBinData(); // Java에서 데이터 읽고 JavaScript로 전달
             // Home 위치 전달
-            getHomeLocation();
+            homeService.loadHomeLocation();
         });
 
+        // JavaScript Callback Interface 주입
         browser.set(InjectJsCallback.class, params -> {
             JsObject window = params.frame().executeJavaScript("window");
             window.putProperty("java", new JavaMarkerObject());
@@ -58,55 +56,54 @@ public class MapPanel extends JPanel {
         });
     }
 
-    // ================ 전체 쓰레기통 위치 불러오기 + 마커 표시  =================
-    public void loadTrashBinData() {
-        List<Map<String, Object>> binData = Utils.allBinSelector();
-        // {"bin_id":4051,"bin_type":"0","city":"강동구","latitude":37.55174312,"detail":"주양쇼핑 따릉이 대여소(1036) 앞\r","longitude":127.1545325}
-        String jsonData = new Gson().toJson(binData);
+//    // ================ 전체 쓰레기통 위치 불러오기 + 마커 표시  =================
+//    public void loadTrashBinData() {
+//        List<Map<String, Object>> binData = BinUtils.allBinSelector();
+//        String jsonData = new Gson().toJson(binData);
+//
+//        browser.mainFrame().ifPresent(frame -> {
+//            frame.executeJavaScript(String.format("loadTrashBins(%s);", jsonData));
+//        });
+//    }
 
-        browser.mainFrame().ifPresent(frame -> {
-            frame.executeJavaScript(String.format("loadTrashBins(%s);", jsonData));
-        });
-    }
-
-    // ================ 장소 검색  =================
-    public void searchPlaces(String keyword) {
-        String script = String.format("searchPlaces('%s')", keyword.replace("'", "\\'")); // 안전한 문자열 처리
-        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
-    }
+//    // ================ 장소 검색  =================
+//    public void searchPlaces(String keyword) {
+//        String script = String.format("searchPlaces('%s')", keyword.replace("'", "\\'")); // 안전한 문자열 처리
+//        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
+//    }
 
     // 마커 클릭 이벤트 인터페이스 구현
     public void addMarkerClickEventListener(MarkerClickEventListener markerClickEventListener) {
         this.markerClickEventListener = markerClickEventListener;
     }
 
-    public void engineClose() {
-        engine.close();
-    }
+//    public void engineClose() {
+//        browserManager.closeEngine();
+//    }
 
-    // ================  쓰레기통 추가  =================
-    public void enableBinAddingMode() {
-        isAddingBin = true;
-        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
-    }
+//    // ================  쓰레기통 추가  =================
+//    public void enableBinAddingMode() {
+//        isAddingBin = true;
+//        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
+//    }
 
-    // ================ 마커 찍기 모드 비활성화 =================
-    public void disableBinAddingMode() {
-        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("removeBinAddingMode()"));
-        isAddingBin = false;  // 마커 추가 모드 비활성화
-        System.out.println("쓰레기통 추가 모드가 종료되었습니다.");
-    }
-
-    // ================ 쓰레기통 삭제 ================
-    public void deleteBin(int markerIndex) {
-        int result = Utils.deleteBinData(markerIndex);
-
-        if (result == 0) {
-            System.out.println("쓰레기통이 정상적으로 삭제되었습니다.");
-        } else if (result == -1) {
-            System.out.println("쓰레기통이 정상적으로 삭제되지 않았습니다.");
-        }
-    }
+//    // ================ 마커 찍기 모드 비활성화 =================
+//    public void disableBinAddingMode() {
+//        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("removeBinAddingMode()"));
+//        isAddingBin = false;  // 마커 추가 모드 비활성화
+//        System.out.println("쓰레기통 추가 모드가 종료되었습니다.");
+//    }
+//
+//    // ================ 쓰레기통 삭제 ================
+//    public void deleteBin(int markerIndex) {
+//        int result = BinUtils.deleteBinData(markerIndex);
+//
+//        if (result == 0) {
+//            System.out.println("쓰레기통이 정상적으로 삭제되었습니다.");
+//        } else if (result == -1) {
+//            System.out.println("쓰레기통이 정상적으로 삭제되지 않았습니다.");
+//        }
+//    }
 
     // ================ 지도 중심으로 이동 ================
     public void setCenter(double lat, double lng) {
@@ -116,33 +113,33 @@ public class MapPanel extends JPanel {
         });
     }
 
-    // ================ HOME 위치 받아오기 ================
-    public void getHomeLocation() {
-        HomeLocation home = Utils.getHomeLocation();
+//    // ================ HOME 위치 받아오기 ================
+//    public void getHomeLocation() {
+//        HomeLocation home = BinUtils.getHomeLocation();
+//
+//        if (home != null) {
+//            // 특수 문자 처리
+//            String safeAddress = home.getAddress().replace("'", "\\'").replace("\"", "\\\"");
+//
+//            // JavaScript로 Home 위치 전달
+//            String script = String.format(
+//                    "setTimeout(() => { setHomeCenter(%f, %f); addHomeIcon(%f, %f, '%s'); }, 500);",
+//                    home.getLatitude(), home.getLongitude(),
+//                    home.getLatitude(), home.getLongitude(), safeAddress
+//            );
+//
+//            browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
+//            System.out.println("Home 위치로 초기화되었습니다: " + home.getAddress());
+//        } else {
+//            System.out.println("Home 위치가 설정되지 않았습니다. 기본 위치를 사용합니다.");
+//        }
+//    }
 
-        if (home != null) {
-            // 특수 문자 처리
-            String safeAddress = home.getAddress().replace("'", "\\'").replace("\"", "\\\"");
-
-            // JavaScript로 Home 위치 전달
-            String script = String.format(
-                    "setTimeout(() => { setHomeCenter(%f, %f); addHomeIcon(%f, %f, '%s'); }, 500);",
-                    home.getLatitude(), home.getLongitude(),
-                    home.getLatitude(), home.getLongitude(), safeAddress
-            );
-
-            browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
-            System.out.println("Home 위치로 초기화되었습니다: " + home.getAddress());
-        } else {
-            System.out.println("Home 위치가 설정되지 않았습니다. 기본 위치를 사용합니다.");
-        }
-    }
-
-    // HOME 설정
-    public void enableHomeSettingMode() {
-        isHomeMode = true;
-        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addHome()"));
-    }
+//    // HOME 설정
+//    public void enableHomeSettingMode() {
+//        isHomeMode = true;
+//        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addHome()"));
+//    }
 
     //================== 쓰레기통 마커 초기화(클릭해체) ===================
     public void resetMarkerImage() {
@@ -199,7 +196,7 @@ public class MapPanel extends JPanel {
 
             if (confirm == JOptionPane.YES_OPTION) {
                 // Home 위치 업데이트 시도 - 항상 id 1 번에 저장된다.
-                int result = Utils.updateHomeLocation(lat, lng, address);
+                int result = BinUtils.updateHomeLocation(lat, lng, address);
 
                 if (result > 0) {
                     JOptionPane.showMessageDialog(
@@ -215,9 +212,9 @@ public class MapPanel extends JPanel {
                         frame.executeJavaScript(script);
                     });
                     // Home 설정 모드 비활성화
-                    isHomeMode = false;
+                    homeService.disableHomeMode();
                     browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("document.body.style.cursor = 'default';"));
-                    getHomeLocation();
+                    homeService.loadHomeLocation();
                 } else {
                     JOptionPane.showMessageDialog(
                             null,
@@ -238,9 +235,7 @@ public class MapPanel extends JPanel {
 
         @JsAccessible
         public double callJavaGetReview(int bin_id) {
-            return Utils.selectBinReview(bin_id);
+            return BinUtils.selectBinReview(bin_id);
         }
     }
-
-
 }

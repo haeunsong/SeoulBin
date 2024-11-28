@@ -1,7 +1,7 @@
 package seoulbin.stamp;
 
-import seoulbin.mapdata.Utils;
 import seoulbin.Main;
+import seoulbin.utils.StampUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -75,7 +75,7 @@ public class Stamp extends JPanel {
     private void loadImageAndButtons(int imageId) {
         try {
             // 이미지 경로 가져오기
-            imagePath = Utils.getImagePath(imageId);
+            imagePath = StampUtils.getImagePath(imageId);
             if (imagePath == null) {
                 JOptionPane.showMessageDialog(this, "이미지를 찾을 수 없습니다.", "알림", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -99,7 +99,7 @@ public class Stamp extends JPanel {
             // 버튼 초기화
             buttonPanel.removeAll();
             stampButtons = new JButton[GRID_SIZE][GRID_SIZE];
-            List<Integer> openedPieces = Utils.getOpenedPieces(imageId);
+            List<Integer> openedPieces = StampUtils.getOpenedPieces(imageId);
             revealedCount = openedPieces.size();
 
             for (int i = 0; i < GRID_SIZE; i++) {
@@ -141,7 +141,7 @@ public class Stamp extends JPanel {
 
     private void loadNextImage() {
         int nextImageId = currentImageId + 1;
-        if (Utils.getImagePath(nextImageId) != null) {
+        if (StampUtils.getImagePath(nextImageId) != null) {
             currentImageId = nextImageId;
             loadImageAndButtons(currentImageId);
         } else {
@@ -151,7 +151,7 @@ public class Stamp extends JPanel {
 
     private void loadBeforeImage() {
         int beforeImageId = currentImageId - 1;
-        if (Utils.getImagePath(beforeImageId) != null) {
+        if (StampUtils.getImagePath(beforeImageId) != null) {
             currentImageId = beforeImageId;
             loadImageAndButtons(currentImageId);
         } else {
@@ -192,7 +192,7 @@ public class Stamp extends JPanel {
             openedToday++;
 
             int pieceId = row * GRID_SIZE + col;
-            Utils.updateProgress(currentImageId, pieceId, true);
+            StampUtils.updateProgress(currentImageId, pieceId, true);
 
             textLabel.setText("  현재 " + revealedCount + " 조각 완성!  ");
 

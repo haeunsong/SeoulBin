@@ -1,6 +1,6 @@
 package seoulbin.review;
 
-import seoulbin.mapdata.Utils;
+import seoulbin.utils.BinUtils;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -60,12 +60,12 @@ public class ReviewDialog extends JDialog {
             public void mouseClicked(MouseEvent e) {
 
                 // 리뷰가 있다면 리뷰를 업데이트하는 방식
-                boolean hasReview = Utils.hasExistingReview(bin_index);
+                boolean hasReview = BinUtils.hasExistingReview(bin_index);
                 if(hasReview) {
-                   Utils.updateBinReview(bin_index, index+1);
+                   BinUtils.updateBinReview(bin_index, index+1);
                 }else {
                     // 리뷰 새로 추가
-                    Utils.addBinReview(bin_index, index + 1); //1부터 시작이라서 (1추가) // 별 인덱스는 0
+                    BinUtils.addBinReview(bin_index, index + 1); //1부터 시작이라서 (1추가) // 별 인덱스는 0
                 }
                 dispose();
             }

@@ -1,4 +1,4 @@
-package seoulbin;
+package seoulbin.map;
 
 import com.sun.net.httpserver.HttpServer;
 

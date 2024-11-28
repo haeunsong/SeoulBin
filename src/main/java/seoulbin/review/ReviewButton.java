@@ -1,7 +1,8 @@
 package seoulbin.review;
 
+import seoulbin.utils.BinUtils;
+
 import javax.swing.*;
-import seoulbin.mapdata.Utils;
 
 public class ReviewButton extends JButton {
     int review = 0;
@@ -11,7 +12,7 @@ public class ReviewButton extends JButton {
     }
 
     public void loadReview(int bin_index) {
-        review = (int)Math.round(Utils.selectBinReview(bin_index)); // 반올림
+        review = (int)Math.round(BinUtils.selectBinReview(bin_index)); // 반올림
     }
     
     public int getReview() { return review; }

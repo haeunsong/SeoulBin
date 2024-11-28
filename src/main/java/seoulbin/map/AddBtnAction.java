@@ -1,4 +1,4 @@
-package seoulbin;
+package seoulbin.map;
 
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -19,8 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import seoulbin.mapdata.Utils;
 import seoulbin.model.Model;
+import seoulbin.utils.BinUtils;
 
 
 // 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
@@ -277,13 +277,13 @@ class AddBtnAction extends JFrame {
 					// 데베에 전달: 주소, 체크박스 체크여부 2개, 이미지 경로
 					if (getCheckBoxValue(general, recycle) == 0 || getCheckBoxValue(general, recycle) == 1 || getCheckBoxValue(general, recycle) == 2) {
 						if (getCheckBoxValue(general, recycle) == 2) {
-							Utils.addBinData(lat, lng, 0, detailText, cityText, imagePath);
-							Utils.addBinData(lat, lng, 1, detailText, cityText, imagePath);
+							BinUtils.addBinData(lat, lng, 0, detailText, cityText, imagePath);
+							BinUtils.addBinData(lat, lng, 1, detailText, cityText, imagePath);
 							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음
 						} else {
 							System.out.println("쓰레기통 추가 정보가 정상적으로 데이터베이스에 전달되었습니다."); // 확인용
-							Utils.addBinData(lat, lng, getCheckBoxValue(general, recycle), detailText, cityText,
+							BinUtils.addBinData(lat, lng, getCheckBoxValue(general, recycle), detailText, cityText,
 									imagePath);
 							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음

@@ -150,8 +150,6 @@ public class Main extends JFrame {
                         "정말 삭제하시겠습니까?", "Mesaage", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     // 삭제하는 부분
-//                    System.out.println(marker.lat + ", " + marker.lng + "삭제" + marker.type);
-//                    mapPanel.deleteBin(marker, "src/main/resources/static/333.jpg");
                 	mapPanel.deleteBin(marker.index);
                     marker = null;
                     
@@ -217,8 +215,6 @@ public class Main extends JFrame {
         mapPanel.addMarkerClickEventListener(new MarkerClickEventListener() {
             @Override
             public void markerClicked(MarkerEvent e) { // MarkerEvent.index
-//                System.out.println("이벤트 테스트용 : "+ e.index);
-//                markerIndex = e.index;
                 marker = e;
                 if (e != null) {
                     reviewButton.loadReview(e.index);

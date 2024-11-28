@@ -80,7 +80,6 @@ public class Stamp extends JPanel {
             }
 
             // 이미지 로드 및 크기 조정
-            System.out.println("imagePath:"+imagePath);
             fullImage = ImageIO.read(new File(imagePath));
             if(fullImage == null) {
                 System.out.println("fullImage 가 null 입니다.");

@@ -8,7 +8,7 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-//위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
+// 위도와 경도(DB에 전달), 주소(화면 상단 주소 표시에 사용)를 지도측에서 받아와야함.
 class DelBtnAction extends JFrame {
     private JLabel instructionLabel, imageLabel, addressLabel, trashTypeLabel, agreeLabel;
     private JPanel checkBoxPanel, radioButtonPanel;
@@ -165,7 +165,6 @@ class DelBtnAction extends JFrame {
         delFrame.anchor = GridBagConstraints.CENTER; // 왼쪽 정렬
         add(radioButtonPanel, delFrame);
 
-
         // 확인 버튼
         confirmButton = new JButton("확인");
         confirmButton.addActionListener(new ActionListener() {
@@ -212,17 +211,9 @@ class DelBtnAction extends JFrame {
                         break;
                 }
                 
-                //String imagePath = ((ImageIcon) imageIcon).getDescription();
-                // 데베에 전달: 주소, 체크박스 체크여부 2개, 이미지 경로 
-                //if(getCheckBoxValue(checkBox1,checkBox2)==0||getCheckBoxValue(checkBox1,checkBox2)==1||getCheckBoxValue(checkBox1,checkBox2)==2) {
-                	//saveAddBin(getCheckBoxValue(checkBox1,checkBox2), receivedAddress, imagePath);
-                //}
-                System.out.println("데이터 베이스에 전달"); // 확인용
-                
                 String message = "주소: " + receivedAddress + "\n" +
                         		"쓰레기통 종류: " + optionText + "\n" +  // 선택된 옵션을 출력
                         		"사진 : 첨부됨.";
-                
 
                 // 메시지 표시
                 JOptionPane.showMessageDialog(DelBtnAction.this, message, "입력된 정보", JOptionPane.INFORMATION_MESSAGE);

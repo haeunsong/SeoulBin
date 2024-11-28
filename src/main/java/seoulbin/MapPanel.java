@@ -21,12 +21,11 @@ import java.util.Map;
 public class MapPanel extends JPanel {
     private final Browser browser;
     private final Engine engine;
-    private List<Map<String, Object>> binList; // 쓰레기통 리스트
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
     private boolean isAddingBin = false;
     private boolean isHomeMode = false;
-    private JsObject currentMarker = null;  // 현재 마커를 저장할 변수
     private Object downAddFrame;
+
     public MapPanel() {
         // 1. JxBrowser 엔진 초기화
         engine = Engine.newInstance(EngineOptions.newBuilder(HARDWARE_ACCELERATED)
@@ -59,6 +58,7 @@ public class MapPanel extends JPanel {
             return InjectJsCallback.Response.proceed();
         });
     }
+
     // ================ 전체 쓰레기통 위치 불러오기 + 마커 표시  =================
     public void loadTrashBinData() {
         List<Map<String, Object>> binData = Utils.allBinSelector();
@@ -87,40 +87,33 @@ public class MapPanel extends JPanel {
 
     // ================  쓰레기통 추가  =================
     public void enableBinAddingMode() {
-    	isAddingBin=true;
+        isAddingBin = true;
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addNewBin()"));
     }
+
     // ================ 마커 찍기 모드 비활성화 =================
     public void disableBinAddingMode() {
-    	browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("removeBinAddingMode()"));
-    	isAddingBin = false;  // 마커 추가 모드 비활성화
-        System.out.println("마커 추가 모드 종료");
+        browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("removeBinAddingMode()"));
+        isAddingBin = false;  // 마커 추가 모드 비활성화
+        System.out.println("쓰레기통 추가 모드가 종료되었습니다.");
     }
-    // ================창이 내려갔는지 확인하는 메소드=============
-    public void handleAddBtnActionClosure(Object result) {
-        // 예시로, 쓰레기통 추가 완료 메시지를 표시
-    	System.out.println("쓰레기통 추가완료");
-    	downAddFrame=result;
-    }
+
     public Object getDownAddFrame() {
-    	return downAddFrame;
+        return downAddFrame;
     }
 
     // ================ 쓰레기통 삭제 ================
     public void deleteBin(int markerIndex) {
         int result = Utils.deleteBinData(markerIndex);
 
-        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
+        if (result == 0) {
+            System.out.println("쓰레기통이 정상적으로 삭제되었습니다.");
+        } else if (result == -1) {
+            System.out.println("쓰레기통이 정상적으로 삭제되지 않았습니다.");
+        }
     }
 
-    //================  쓰레기통 삭제  =================
-    public void deleteBin(MarkerEvent marker, String imagePath) {
-        int result = Utils.deleteBinData(marker.lat, marker.lng, marker.type, imagePath);
-
-        System.out.println("삭제 여부: " + result); // 삭제 0 오류시 -1
-    }
-
-
+    // ================ 지도 중심으로 이동 ================
     public void setCenter(double lat, double lng) {
         String script = String.format("setCenter(%f, %f)", lat, lng);
         browser.mainFrame().ifPresent(frame -> {
@@ -128,7 +121,8 @@ public class MapPanel extends JPanel {
         });
     }
 
-    public void getHomeLocation(){
+    // ================ HOME 위치 받아오기 ================
+    public void getHomeLocation() {
         HomeLocation home = Utils.getHomeLocation();
 
         if (home != null) {
@@ -143,31 +137,28 @@ public class MapPanel extends JPanel {
             );
 
             browser.mainFrame().ifPresent(frame -> frame.executeJavaScript(script));
-            System.out.println("Home 위치로 초기화됨: " + home.getAddress());
+            System.out.println("Home 위치로 초기화되었습니다: " + home.getAddress());
         } else {
-            System.out.println("Home 위치가 설정되지 않았습니다. 기본 위치 사용.");
+            System.out.println("Home 위치가 설정되지 않았습니다. 기본 위치를 사용합니다.");
         }
     }
 
-
     // HOME 설정
     public void enableHomeSettingMode() {
-        isHomeMode=true;
+        isHomeMode = true;
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("addHome()"));
     }
 
-
-  //================== 쓰레기통 마커 초기화(클릭해체)-------
+    //================== 쓰레기통 마커 초기화(클릭해체) ===================
     public void resetMarkerImage() {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("resetMarkerImage()"));
     }
-    
-    // == 맵 사이즈 재설정 ==
+
+    // ================ 맵 사이즈 재설정 ===================
     public void resizeMap() {
         SwingUtilities.invokeLater(() -> { // 스윙 변경사항 기다리기
             Dimension size = getSize(); // 현재 패널사이즈 가져오기
             String script = String.format("resizeMap(%d, %d)", size.width, size.height);
-//            System.out.println(script);
             browser.mainFrame().ifPresent(frame -> {
                 frame.executeJavaScript(script); //자바스크립트 실행
             });
@@ -176,7 +167,6 @@ public class MapPanel extends JPanel {
 
     public final class JavaMarkerObject {
         public MarkerEvent markerEvent;
-        public MapPanel mapPanel;
 
         @JsAccessible // 자바스크립트에서 호출
         public void callJavaMarkerEvent(Integer index, Double lat, Double lng, Integer type) { // 자바스크립트 호출때 사용할 이름
@@ -228,10 +218,9 @@ public class MapPanel extends JPanel {
                     String script = String.format("addHomeIcon(%f, %f, '%s');", lat, lng, safeAddress);
                     browser.mainFrame().ifPresent(frame -> {
                         frame.executeJavaScript(script);
-                        System.out.println("JavaScript addHomeIcon executed successfully.");
                     });
                     // Home 설정 모드 비활성화
-                    isHomeMode=false;
+                    isHomeMode = false;
                     browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("document.body.style.cursor = 'default';"));
                     getHomeLocation();
                 } else {
@@ -257,6 +246,6 @@ public class MapPanel extends JPanel {
             return Utils.selectBinReview(bin_id);
         }
     }
-    
-    
+
+
 }

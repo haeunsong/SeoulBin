@@ -1,9 +1,8 @@
 package mapdata;
-// test
+
 import model.Model;
 import seoulbin.HomeLocation;
 
-import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Utils {
-
-    // tester
-    public static void tester() {
-        System.out.println("test log");
-    }
 
     private static Connection connection;
 
@@ -49,37 +43,10 @@ public class Utils {
                 binData.put("city", rs.getString("city"));
                 binList.add(binData);
             }
-
-            System.out.println("Connection success");
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return binList;
-    }
-
-    /*
-    name: allBinReturn
-    Param: None
-    desc: allBinSelector 메서드 호출 후 데이터를 확인하고 반환
-    return: 0 if success, -1 if failure
-    */
-
-    public static int allBinReturn() {
-        List<Map<String, Object>> binDataList = allBinSelector();
-
-        if (binDataList.isEmpty()) {
-            System.out.println("No data found or failed to retrieve data");
-            return -1; // 실패
-        }
-
-        // 데이터 출력 (테스트 용도)
-        for (Map<String, Object> binData : binDataList) {
-            System.out.println("Bin_Id: " + binData.get("bin_id") +
-                    "Longitude: " + binData.get("longitude") +
-                    ", Latitude: " + binData.get("latitude") +
-                    ", Bin Type: " + binData.get("bin_type"));
-        }
-        return 0; // 성공
     }
 
        /*
@@ -108,7 +75,7 @@ public class Utils {
 
                 // 데이터 추가 성공 여부 확인
                 if (rowsAffected > 0) {
-                    System.out.println("Data inserted successfully.");
+                    System.out.println("쓰레기통이 정상적으로 추가되었습니다.");
                     return 0; // 성공
                 }
             } catch (SQLException e) {
@@ -141,7 +108,6 @@ public class Utils {
                 // 결과가 있으면 평균 review 값을 가져옴
                 if (rs.next()) {
                     double avgReview = rs.getDouble("avg_review");
-                   // System.out.println("Average review: " + avgReview);
                     return avgReview; // 평균값 반환
                 }
             }
@@ -174,7 +140,7 @@ public class Utils {
 
             // 데이터 추가 성공 여부 확인
             if (rowsAffected > 0) {
-                System.out.println("Data inserted successfully.");
+                System.out.println("쓰레기통 리뷰가 정상적으로 등록되었습니다.");
                 return 0; // 성공
             }
         } catch (SQLException e) {
@@ -199,7 +165,7 @@ public class Utils {
 
             // 데이터 업데이트 성공 여부 확인
             if (rowsAffected > 0) {
-                System.out.println("Data updated successfully.");
+                System.out.println("쓰레기통 리뷰가 정상적으로 등록되었습니다.");
                 return 0; // 성공
             }
         } catch (SQLException e) {
@@ -228,38 +194,10 @@ public class Utils {
 
     /*
        name: deleteBinData
-       Param: double latitude, double longitude, int bin_type
+       Param: int bin_id
        desc: binList에서 Bin 삭제
        return: 0 if success, -1 if failure
    */
-    public static int deleteBinData(double latitude, double longitude, int bin_type, String imagePath) {
-        String deleteQuery = "DELETE FROM binList WHERE latitude = ? AND longitude = ? AND bin_type = ?";
-
-        if(Model.isBin(imagePath) == 0) {
-            try (Connection conn = Utils.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
-
-                // PreparedStatement에 값 설정
-                pstmt.setDouble(1, latitude);
-                pstmt.setDouble(2, longitude);
-                pstmt.setInt(3, bin_type);
-
-                // 쿼리 실행
-                int rowsAffected = pstmt.executeUpdate();
-
-                // 데이터 추가 성공 여부 확인
-                if (rowsAffected > 0) {
-                    System.out.println("Data Delete successfully.");
-                    return 0; // 성공
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return -1; // 실패
-        } else {
-            return -1;
-        }
-    }
     public static int deleteBinData(int bin_id) {
         String url = "jdbc:sqlite:src/main/java/database/seoulbin.sqlite3";
         String deleteQuery = "DELETE FROM binList WHERE bin_id = ?";
@@ -275,7 +213,7 @@ public class Utils {
 
             // 데이터 추가 성공 여부 확인
             if (rowsAffected > 0) {
-                System.out.println("Data Delete successfully.");
+                System.out.println("쓰레기통이 정상적으로 삭제되었습니다.");
                 return 0; // 성공
             }
         } catch (SQLException e) {
@@ -298,7 +236,6 @@ public class Utils {
 
             if (rs.next()) {
                 path = rs.getString("image_path");
-                System.out.println("Image Path: " + path);
             } else {
                 System.out.println("No data found for imageId: " + imageId);
             }
@@ -343,9 +280,6 @@ public class Utils {
             pstmt.setInt(2, imageId);
             pstmt.setInt(3, pieceId);
             pstmt.executeUpdate();
-
-            System.out.println("Progress updated for imageId: " + imageId + ", pieceId: " + pieceId);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -369,39 +303,6 @@ public class Utils {
         }
 
         return openedPieces;
-    }
-
-    // 조각을 클릭하면 스탬프 판에 업데이트 하기
-    // picedId : 사용자가 클릭한 조각
-    public void openPiece(int pieceId, int currentImageId, JButton[] puzzleButtons ) {
-        String sql = "UPDATE progress SET status = 1 WHERE image_id = ? AND piece_id = ?";
-        try (Connection conn = Utils.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, currentImageId);
-            pstmt.setInt(2, pieceId);
-            pstmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // home 위치 새로 저장
-    public static int saveHomeLocation(double latitude, double longitude, String address) {
-        String query = "INSERT INTO home (latitude, longitude, address) " +
-                "VALUES (?, ?, ?)";
-
-        try (Connection conn = Utils.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-            pstmt.setDouble(1, latitude);
-            pstmt.setDouble(2, longitude);
-            pstmt.setString(3, address);
-
-            return pstmt.executeUpdate(); // 성공 시 1 반환
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1; // 실패
     }
 
     // home 위치 수정
@@ -446,5 +347,4 @@ public class Utils {
 
         return null; // Home 위치가 없을 경우 null 반환
     }
-
 }

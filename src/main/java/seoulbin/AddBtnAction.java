@@ -7,8 +7,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -121,12 +119,6 @@ class AddBtnAction extends JFrame {
 		addFrame.gridx = 2;
 		addFrame.anchor = GridBagConstraints.WEST; // 왼쪽 정렬
 		frame.add(recycle, addFrame);
-
-//        // 이미지 표시 영역과 이미지 선택 버튼
-//        JLabel imageLabel = new JLabel("이미지: ");
-//        addFrame.gridx = 0;
-//        addFrame.gridy = 5;
-//        frame.add(imageLabel, addFrame);
 
 		// 이미지 표시용 JLabel (초기에는 텍스트만 표시)
 		JLabel selectedImageLabel = new JLabel("선택된 이미지 없음");
@@ -261,8 +253,6 @@ class AddBtnAction extends JFrame {
 					break;
 				}
 
-				// String imagePath = ((ImageIcon) imageIcon).getDescription();
-
 				// 모델 호출 (isBin 메서드 사용)
 				int binResult = Model.isBin(imagePath);
 
@@ -287,21 +277,16 @@ class AddBtnAction extends JFrame {
 					// 데베에 전달: 주소, 체크박스 체크여부 2개, 이미지 경로
 					if (getCheckBoxValue(general, recycle) == 0 || getCheckBoxValue(general, recycle) == 1 || getCheckBoxValue(general, recycle) == 2) {
 						if (getCheckBoxValue(general, recycle) == 2) {
-							System.out.println("데이터 베이스에 전달"); // 확인용
 							Utils.addBinData(lat, lng, 0, detailText, cityText, imagePath);
-							System.out.println("데이터 베이스에 전달"); // 확인용
 							Utils.addBinData(lat, lng, 1, detailText, cityText, imagePath);
 							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음
-							// 창을 닫을 때 null을 반환 (MapView에서 이를 확인)
-							
 						} else {
-							System.out.println("데이터 베이스에 전달"); // 확인용
+							System.out.println("쓰레기통 추가 정보가 정상적으로 데이터베이스에 전달되었습니다."); // 확인용
 							Utils.addBinData(lat, lng, getCheckBoxValue(general, recycle), detailText, cityText,
 									imagePath);
 							JOptionPane.showMessageDialog(AddBtnAction.this, "정보가 저장되었습니다.", "완료", JOptionPane.INFORMATION_MESSAGE);
 							frame.dispose(); // 창을 닫음
-							// 창을 닫을 때 null을 반환 (MapView에서 이를 확인)
 						}
 					}
 				} else {
@@ -309,17 +294,7 @@ class AddBtnAction extends JFrame {
 					JOptionPane.showMessageDialog(AddBtnAction.this, "정보 저장이 취소되었습니다.", "취소", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
-
 		});
-		// 창이 닫힐 때 이벤트 리스너 추가 (windowClosed)
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                // 창이 닫힐 때 null을 반환 (MapView에서 이를 확인)
-//                mapPanel.handleAddBtnActionClosure(null);  // MapView에게 null 값을 전달
-            }
-        });
-
 		// 화면 표시
 		frame.setVisible(true);
 	}

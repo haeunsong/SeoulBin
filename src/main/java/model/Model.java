@@ -9,7 +9,6 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class Model {
 

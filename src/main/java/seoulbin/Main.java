@@ -1,5 +1,5 @@
 package seoulbin;
-// 텍스트 엔터 검색
+// 텍스트 엔터 검색 // 검색시 map.level()없다는 에러 메시지 제거
 // 맵 로딩할 때 인포 닫기
 // 검색시 마커 제거
 import seoulbin.stamp.Stamp;
@@ -53,7 +53,17 @@ public class Main extends JFrame {
         searchField.setBounds(35, 120, 200, 40);
         searchField.setFont(new Font("Malgun gothic", Font.BOLD, 16));
         leftPanel.add(searchField);
-
+        
+        // 검색 필드 엔터 검색 이벤트
+        searchField.addActionListener(e -> {
+        	String keyword = searchField.getText().trim();
+            if (keyword.isEmpty()) {
+                JOptionPane.showMessageDialog(Main.this, "검색어를 입력해주세요.", "알림", JOptionPane.WARNING_MESSAGE);
+            } else {
+                // JavaScript의 searchPlaces 함수 호출
+                mapPanel.searchPlaces(keyword);
+            }
+        });
         // ================ 검색 버튼  =================
         JButton searchButton = new JButton("검색");
         searchButton.setBounds(35, 160, 80, 30);

@@ -1,6 +1,7 @@
 let map;
 let places;
 let markers = [];
+let infoWindows = [];
 let searchMarkers = [];
 let isMarkerClickEnable = true; // 마커 클릭 이벤트 활성화 여부
 let isMapClickEnabel = false; // 맵 클릭 이벤트 활성화 여부
@@ -43,9 +44,14 @@ function loadTrashBins(data) {
         console.error("Map is not initialized.");
         return;
     }
+	
+	// 모든 info닫기 >> 가끔 info가 열린 상태로 맵을 재로딩하면 info가 안사라지는 오류가 있음
+	closeAllInfoWindows();
+	
     // 기존 마커 초기화
     markers.forEach(marker => marker.setMap(null));
     markers = [];
+	infoWindows = []; // info 배열 초기화
     // 클릭된 마커 초기화
     clickedMarker = null;
 
@@ -134,11 +140,16 @@ function loadTrashBins(data) {
         });
 
         markers.push(marker);
+		infoWindows.push(infowindow);
     });
 
     // filter 초기화 >> 삭제 후 재 로딩할 때, 필터도 초기화 시키기 위함
     filterMarkers('all');
     console.log("All markers added to the map.");
+}
+
+function closeAllInfoWindows() {
+    infoWindows.forEach(infoWindow => infoWindow.close());
 }
 
 // 리뷰 별표를 생성하는 함수
@@ -158,7 +169,7 @@ function generateStarRating(review) {
 // 3. 장소 검색
 function searchPlaces(keyword) {
 
-    clearMarkers();
+    //clearMarkers();
 
     places.keywordSearch(keyword, (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
@@ -166,14 +177,16 @@ function searchPlaces(keyword) {
             let lat = place.y;
             let lng = place.x;
             let name = place.place_name;
-
+			
+			/*
             const marker = new kakao.maps.Marker({
                 position: new kakao.maps.LatLng(lat, lng),
                 map: map
             });
             searchMarkers.push(marker);
+			*/
             map.setCenter(new kakao.maps.LatLng(lat, lng));
-            map.level()
+			map.setLevel(5);
 
         } else {
             console.log("Search failed with status:", status);
@@ -181,10 +194,12 @@ function searchPlaces(keyword) {
     });
 }
 
+/*
 function clearMarkers() {
-    searchMarkers.forEach(marker => marker.setMap(null)); // 지도에서 제거
-    searchMarkers = []; // 배열 초기화
+	searchMarkers.forEach(marker => marker.setMap(null)); // 지도에서 제거
+	searchMarkers = []; // 배열 초기화
 }
+*/
 
 // 마커 필터링 함수
 function filterMarkers(type) {

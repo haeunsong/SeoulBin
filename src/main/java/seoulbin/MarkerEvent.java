@@ -21,10 +21,4 @@ public class MarkerEvent {
         this.lng = lng;
         this.type = type;
     }
-    
-    public MarkerEvent(double lat, double lng, String address) {
-    	this.lat=lat;
-    	this.lng=lng;
-    	this.address=address;
-    }
 }

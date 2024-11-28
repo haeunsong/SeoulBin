@@ -31,8 +31,8 @@ public class ReviewDialog extends JDialog {
         setLocationRelativeTo(frame);
         setSize(300, 100);
 
-//        requestFocusInWindow();
-        setFocusable(false);
+        requestFocusInWindow();
+        setFocusable(true);
         setVisible(true);
     }
 

@@ -24,7 +24,6 @@ public class MapPanel extends JPanel {
     private MarkerClickEventListener markerClickEventListener; // 마커 클릭 리스너 인터페이스
     private boolean isAddingBin = false;
     private boolean isHomeMode = false;
-    private Object downAddFrame;
 
     public MapPanel() {
         // 1. JxBrowser 엔진 초기화
@@ -96,10 +95,6 @@ public class MapPanel extends JPanel {
         browser.mainFrame().ifPresent(frame -> frame.executeJavaScript("removeBinAddingMode()"));
         isAddingBin = false;  // 마커 추가 모드 비활성화
         System.out.println("쓰레기통 추가 모드가 종료되었습니다.");
-    }
-
-    public Object getDownAddFrame() {
-        return downAddFrame;
     }
 
     // ================ 쓰레기통 삭제 ================

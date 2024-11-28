@@ -1,19 +1,17 @@
 package seoulbin;
-
-import org.json.JSONObject;
+// 텍스트 엔터 검색
+// 맵 로딩할 때 인포 닫기
+// 검색시 마커 제거
 import seoulbin.stamp.Stamp;
 import seoulbin.review.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.time.format.    DateTimeFormatter;
+import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.Scanner;
 import com.formdev.flatlaf.FlatLightLaf;
 
 public class Main extends JFrame {
@@ -21,7 +19,6 @@ public class Main extends JFrame {
     private JLabel dateTimeLabel;
     private MapPanel mapPanel;
     private Stamp stamp;
-//    private Integer markerIndex; // 삭제를 위한 마커 인덱스
     private MarkerEvent marker;
     private ReviewButton reviewButton;
     
@@ -126,17 +123,6 @@ public class Main extends JFrame {
             // reload
             mapPanel.loadTrashBinData();
         });
-        
-        // 양식이 꺼졌을때 맵 리로드
-        if(mapPanel.getDownAddFrame()==null) {
-//        	// 마커 찍기 모드 비활성화
-//        	mapPanel.disableBinAddingMode();
-//        	endPinButton.setVisible(false);  // 핀 찍기 종료 버튼 숨기기(왜 안될까요??)
-        	// 쓰레기통 로딩 다시
-            mapPanel.loadTrashBinData();
-           
-        }
-        
 
         // ================ 쓰레기통 삭제 버튼  =================
         JButton deleteBinButton = new JButton("쓰레기통 삭제");

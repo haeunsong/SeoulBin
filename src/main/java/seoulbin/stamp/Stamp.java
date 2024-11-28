@@ -52,7 +52,7 @@ public class Stamp extends JPanel {
         // 문구 및 이전/다음 이미지 버튼
         JPanel textPanel = new JPanel(new BorderLayout());
         textLabel = new JLabel();
-        textLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        textLabel.setFont(new Font("Malgun gothic", Font.BOLD, 30));
         textPanel.add(textLabel, BorderLayout.CENTER);
 
         // 버튼을 수직으로 배치할 서브 패널
@@ -125,7 +125,7 @@ public class Stamp extends JPanel {
             }
 
             // 문구 갱신
-            textLabel.setText("☺ 현재 " + revealedCount + " 조각 완성! ☺");
+            textLabel.setText("  현재 " + revealedCount + " 조각 완성!  ");
 
             // UI 갱신
             buttonPanel.revalidate();
@@ -134,7 +134,7 @@ public class Stamp extends JPanel {
             layeredPane.repaint();
 
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             JOptionPane.showMessageDialog(this, "더이상 불러올 이미지가 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -194,7 +194,7 @@ public class Stamp extends JPanel {
             int pieceId = row * GRID_SIZE + col;
             Utils.updateProgress(currentImageId, pieceId, true);
 
-            textLabel.setText("☺ 현재 " + revealedCount + " 조각 완성! ☺");
+            textLabel.setText("  현재 " + revealedCount + " 조각 완성!  ");
 
 
             if (revealedCount == GRID_SIZE * GRID_SIZE) {

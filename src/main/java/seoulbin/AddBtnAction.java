@@ -296,6 +296,7 @@ class AddBtnAction extends JFrame {
 			}
 		});
 		// 화면 표시
+		frame.setResizable(false);
 		frame.setVisible(true);
 	}
 }

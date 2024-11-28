@@ -15,6 +15,7 @@ import java.util.List;
 
 public class Stamp extends JPanel {
     private static final int GRID_SIZE = 5; // 5x5 그리드
+    private static final int MAX_PIECES_PER_DAY = 5; // 하루 최대 열 수 있는 조각 수
     private Main mainFrame;
     private JButton[][] stampButtons; // 스탬프 버튼 배열
     private JLabel textLabel;
@@ -26,6 +27,7 @@ public class Stamp extends JPanel {
     private String imagePath; // 이미지 경로
     private JLayeredPane layeredPane;
     private JPanel buttonPanel;
+    private int openedToday = 0; // 오늘 열린 조각 수
 
     public Stamp(Main mainFrame) throws IOException {
         this.mainFrame = mainFrame;
@@ -179,9 +181,15 @@ public class Stamp extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            if (openedToday >= MAX_PIECES_PER_DAY) {
+                JOptionPane.showMessageDialog(Stamp.this, "하루에 최대 " + MAX_PIECES_PER_DAY + " 조각만 열 수 있습니다.", "제한", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             JButton clickedButton = stampButtons[row][col];
             clickedButton.setVisible(false);
             revealedCount++;
+            openedToday++;
 
             int pieceId = row * GRID_SIZE + col;
             Utils.updateProgress(currentImageId, pieceId, true);

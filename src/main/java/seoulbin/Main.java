@@ -27,6 +27,7 @@ public class Main extends JFrame {
     
     public Main() throws IOException {
         setSize(1000, 800);
+        setTitle("SeoulBin 서울시 쓰레기통 위치 제공 서비스");
         setLayout(new BorderLayout());
 
         mainPanel = new JPanel(new BorderLayout());

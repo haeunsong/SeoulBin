@@ -14,7 +14,7 @@ public class Utils {
     private static Connection connection;
 
     public static Connection getConnection() throws SQLException {
-        String url = "jdbc:sqlite:src/main/java/seoulbin.database/seoulbin.sqlite3";
+        String url = "jdbc:sqlite:src/main/java/seoulbin/database/seoulbin.sqlite3";
         return DriverManager.getConnection(url);
     }
 

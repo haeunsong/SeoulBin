@@ -29,7 +29,7 @@ public class BinService {
         int result = BinUtils.deleteBinData(markerIndex);
 
         if (result == 0) {
-            System.out.println("쓰레기통이 정상적으로 삭제되었습니다.");
+//            System.out.println("쓰레기통이 정상적으로 삭제되었습니다.");
         } else if (result == -1) {
             System.out.println("쓰레기통이 정상적으로 삭제되지 않았습니다.");
         }

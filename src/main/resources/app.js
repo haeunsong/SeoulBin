@@ -204,8 +204,11 @@ function filterMarkers(type) {
 
 // 마커 체크마커 이미지 원래대로 돌리기
 function resetMarkerImage() {
-    clickedMarker.setImage(new kakao.maps.MarkerImage(clickedMarker.type === "general" ? 'general.png': 'recycle.png',
-         new kakao.maps.Size(38, 38), { offset: new kakao.maps.Point(20, 40) }));
+	if (clickedMarker) {
+		clickedMarker.setImage(new kakao.maps.MarkerImage(clickedMarker.type === "general" ? 'general.png': 'recycle.png',
+		     new kakao.maps.Size(38, 38), { offset: new kakao.maps.Point(20, 40) }));
+	}
+
     clickedMarker = null;
 }
 

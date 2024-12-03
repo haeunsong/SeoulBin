@@ -17,5 +17,4 @@
 ## 4. 최종 발표 PPT
 [서울빈PPT_241128_최종 (1).pdf](https://github.com/user-attachments/files/17987187/PPT_241128_.1.pdf)
 
-## 5. 회고 Blog
 
